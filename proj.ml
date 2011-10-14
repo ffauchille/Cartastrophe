@@ -11,7 +11,6 @@ let show img dst =
 
 
 
-let load_picture filename = ();; (* charge l'image *)
 let calc_colors_diff (r1,g1,b1) (r2,g2,b2) =
   float_of_int(abs(r1-r2)+abs(g1-g2)+abs(b1-b2))/.255. (*Chiffre entre O et 1 représentant
 							 la
@@ -21,18 +20,38 @@ let calc_colors_diff (r1,g1,b1) (r2,g2,b2) =
 							 afin *)
 
 let calc_contrast (r1,g1,b1) (r2,g2,b2) = ();; (* calcul du contrast *)
-let is_same_area (r1,g1,b1) (r2,g2,b2) f = ();; (* detecte les couleurs
+let is_same_area c1 c2 f = ();; (* detecte les couleurs
 						 appartenantes à la
-						   même zone ,
+						   même zone ,
 						   utilisant une
 						   fonction de
 						   distinction de couleurs  *)
-let detect_areas img = ();; (* detecte les différentes zones *)
-let parse_image img f = ();; (* analyse l'image de haut en bas avec
-				la fonction f *)
-let print_borders img list = ();; (* colore deux pixels en noir en
-				     fonction de la liste résultante
-				     de detect_areas  *)
+let detect_areas img = (* detecte les différentes zones *)
+ 
+    let(w,h) = ((Sdlvideo.surface_info src).Sdlvideo.w,
+    (Sdlvideo.surface_info src).Sdlvideo.h) in
+        for x = 0 to w-1 do
+            for y = 0 to h-1 do
+               if (is_same_area c1 c2 f) then
+            done
+        done
+   ;; 
+
+
+let pixel2black (r,g,b) = (* rend un pixel en noir *) 
+     let u = (int_of_float(level(r,g,b)*.0.)) in (u,u,u))
+
+let print_borders img list = (* colore deux pixels en noir en fonction de la liste résultat de detect_areas  *)
+    
+    let rec length = function
+    [] -> 0
+   |t::q -> 1 + length q in 
+
+    for i = 0 to length-1 do
+        Sdlvideo.put_pixel_color img list (pixel2black( ))
+    done
+
+             
 let rec_borders_to_file list filename = ();;
 
       (* ------------------------------------------------------------------ *)
