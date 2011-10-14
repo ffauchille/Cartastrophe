@@ -11,8 +11,14 @@ let show img dst =
 
 
 
+<<<<<<< HEAD
+=======
+let load_picture filename = Sdlloader.load_image;; (* charge l'image *)
+
+>>>>>>> acadd04bf56679b016655f00dc84246055818f2b
 let calc_colors_diff (r1,g1,b1) (r2,g2,b2) =
-  float_of_int(abs(r1-r2)+abs(g1-g2)+abs(b1-b2))/.255. (*Chiffre entre O et 1 représentant
+  float_of_int(abs(r1-r2)+abs(g1-g2)+abs(b1-b2))/.255. (*Chiffre entre O et 1 
+							    représentant
 							 la
 							 différence
 							 entre les
@@ -26,6 +32,7 @@ let is_same_area c1 c2 f = ();; (* detecte les couleurs
 						   utilisant une
 						   fonction de
 						   distinction de couleurs  *)
+<<<<<<< HEAD
 let detect_areas img = (* detecte les différentes zones *)
  
     let(w,h) = ((Sdlvideo.surface_info src).Sdlvideo.w,
@@ -53,6 +60,19 @@ let print_borders img list = (* colore deux pixels en noir en fonction de la lis
 
              
 let rec_borders_to_file list filename = ();;
+=======
+let detect_areas img = ();; (* detecte les différentes zones *)
+let parse_image img f = ();; (* analyse l'image de haut en bas avec
+				la fonction f *)
+let print_borders img l = ();; (* colore deux pixels en noir en
+				     fonction de la liste résultante
+				     de detect_areas  *)
+let rec borders_to_file l filename = ();;(*match l with
+    |[] -> ()
+    |e::l -> print_boarders *)
+	    
+    
+>>>>>>> acadd04bf56679b016655f00dc84246055818f2b
 
       (* ------------------------------------------------------------------ *)
 
@@ -81,15 +101,11 @@ let main () =
       (* on quitte *)
       exit 0
   end
- 
+
 let _ = main ()
 
 
 
-
-
-
- 
 
 
 
