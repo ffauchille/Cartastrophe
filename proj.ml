@@ -4,6 +4,8 @@ let sdl_init () =
     Sdlevent.enable_events Sdlevent.all_events_mask;
   end
 
+let get_dims img = ((Sdlvideo.surface_info img).Sdlvideo.w,(Sdlvideo.surface_info img).Sdlvideo.h)
+let get_px = Sdlvideo.get_pixel_color 
 let show img dst = 
   let d = Sdlvideo.display_format img in
   Sdlvideo.blit_surface d dst ();
@@ -13,32 +15,48 @@ let show img dst =
 
 let load_picture filename = ();; (* charge l'image *)
 let calc_colors_diff (r1,g1,b1) (r2,g2,b2) =
-  float_of_int(abs(r1-r2)+abs(g1-g2)+abs(b1-b2))/.255. (*Chiffre entre O et 1 représentant
+  float_of_int (abs(r1-r2)+abs(g1-g2)+abs(b1-b2))/.255.
+  (*Chiffre entre O et 1 représentant
 							 la
 							 différence
 							 entre les
 							 couleurs
 							 afin *)
 
+
 let calc_contrast (r1,g1,b1) (r2,g2,b2) = ();; (* calcul du contrast *)
-let is_same_area (r1,g1,b1) (r2,g2,b2) f = ();; (* detecte les couleurs
+let is_same_area c1 c2 f = (f c1 c2)<0.2;; (* detecte les couleurs
 						 appartenantes à la
 						   même zone ,
 						   utilisant une
 						   fonction de
 						   distinction de couleurs  *)
-let detect_areas img = ();; (* detecte les différentes zones *)
-let parse_image img f = ();; (* analyse l'image de haut en bas avec
-				la fonction f *)
+let detect_areas img = (* detecte les différentes zones *)
+	let breaks = ref [] in
+	let lastColor = ref (0,0,0) in
+	let curColor = ref (0,0,0) in
+	let w,h = get_dims img in
+	begin
+	for x=0 to w do
+		for y=0 to h do
+			lastColor := !curColor;
+			curColor := (get_px img x y);
+			if is_same_area !lastColor !curColor calc_colors_diff then
+				breaks := (x,y)::!breaks
+			
+		done
+	done
+	!breaks;
+	end
+	
+(* let parse_image img f = ();; (* analyse l'image de haut en bas avec
+				la fonction f *) *)
 let print_borders img list = ();; (* colore deux pixels en noir en
 				     fonction de la liste résultante
 				     de detect_areas  *)
 let rec_borders_to_file list filename = ();;
 
       (* ------------------------------------------------------------------ *)
-
-let load_picture filename = Sdlloader.load_image Sys.argv.(1) in 
-show filename display;
 
 
 (* main toujours en fin *)
