@@ -11,9 +11,11 @@ let show img dst =
 
 
 
-let load_picture filename = ();; (* charge l'image *)
+let load_picture filename = Sdlloader.load_image;; (* charge l'image *)
+
 let calc_colors_diff (r1,g1,b1) (r2,g2,b2) =
-  float_of_int(abs(r1-r2)+abs(g1-g2)+abs(b1-b2))/.255. (*Chiffre entre O et 1 représentant
+  float_of_int(abs(r1-r2)+abs(g1-g2)+abs(b1-b2))/.255. (*Chiffre entre O et 1 
+							    représentant
 							 la
 							 différence
 							 entre les
@@ -30,10 +32,14 @@ let is_same_area (r1,g1,b1) (r2,g2,b2) f = ();; (* detecte les couleurs
 let detect_areas img = ();; (* detecte les différentes zones *)
 let parse_image img f = ();; (* analyse l'image de haut en bas avec
 				la fonction f *)
-let print_borders img list = ();; (* colore deux pixels en noir en
+let print_borders img l = ();; (* colore deux pixels en noir en
 				     fonction de la liste résultante
 				     de detect_areas  *)
-let rec_borders_to_file list filename = ();;
+let rec borders_to_file l filename = ();;(*match l with
+    |[] -> ()
+    |e::l -> print_boarders *)
+	    
+    
 
       (* ------------------------------------------------------------------ *)
 
@@ -62,15 +68,11 @@ let main () =
       (* on quitte *)
       exit 0
   end
- 
+
 let _ = main ()
 
 
 
-
-
-
- 
 
 
 
