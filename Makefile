@@ -1,11 +1,12 @@
-# TP sdl
- 
+
 OCAML=ocamlopt
 OCAMLFLAGS= -I +sdl
 OCAMLLD= bigarray.cmxa sdl.cmxa sdlloader.cmxa
+BIN_NAME=cartastrophe
+FILES=*.ml
  
-proj: proj.ml
-	${OCAML} ${OCAMLFLAGS} ${OCAMLLD} -o proj proj.ml
+compile: main.ml
+	${OCAML} ${OCAMLFLAGS} ${OCAMLLD} -o ${BIN_NAME} *.ml
  
 clean:
 	rm -f *~ *.o *.cm? proj
