@@ -1,14 +1,14 @@
 
-OCAML=ocamlopt
+OCAML=ocamlc
 OCAMLFLAGS= -I +sdl
-OCAMLLD= bigarray.cmxa sdl.cmxa sdlloader.cmxa
+OCAMLLD= bigarray.cma sdl.cma sdlloader.cma
 BIN_NAME=cartastrophe
-FILES=*.ml
- 
-compile: main.ml
-	${OCAML} ${OCAMLFLAGS} ${OCAMLLD} -o ${BIN_NAME} *.ml
- 
+SOURCES = main.ml
+all: compile
+compile:
+	${OCAML} ${OCAMLFLAGS} ${OCAMLLD} -o ${BIN_NAME} ${SOURCES}
+
 clean:
-	rm -f *~ *.o *.cm? proj
+	rm -f *~ *.o *.cm? .
  
 # FIN
