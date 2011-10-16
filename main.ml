@@ -80,7 +80,7 @@ let is_same_area c1 c2 =
 	 (* let cd = lab_distance c1 c2 in
 	  if cd <> 0. then
 		 print_string ((string_of_color c1)^"-"^(string_of_color c2)^"="^(string_of_float cd)^"\n"); *) 
-	(lab_distance c1 c2)<25.0
+	(lab_distance c1 c2)<20.0
 
 let detect_areas img = (* detecte les différentes zones *)
 	let breaks = ref [] in
