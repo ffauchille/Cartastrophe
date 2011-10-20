@@ -1,3 +1,4 @@
+(* Initialisation de SDL *)
 let init () = 
 	begin
 		Sdl.init [`EVERYTHING];

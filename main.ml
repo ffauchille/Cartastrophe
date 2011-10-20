@@ -17,7 +17,8 @@ let rec wait_key () =
       | _ -> wait_key ()
  
 let string_of_coord (x,y) = "("^(string_of_int x)^","^(string_of_int y)^")" 
-let string_of_color (r,g,b) = "("^(string_of_int r)^","^(string_of_int g)^","^(string_of_int b)^")" 
+let string_of_color (r,g,b) = 
+	"("^(string_of_int r)^","^(string_of_int g)^","^(string_of_int b)^")" 
 
 (* Renvoie un couplet de dimensions *)
 let get_dims img =
@@ -41,12 +42,41 @@ let print_borders_to_file filename list =
 	output_string file (string_of_coord coord^"\n");
 				nested file l
 	in
-	output_string file ("Debut\n");
-	nested file list;
-	output_string file ("Fin");
-	close_out file
-
-
+		output_string file ("Debut\n");
+		nested file list;
+		output_string file ("Fin");
+		close_out file
+let getHeight (x,y) = 10
+let pixel2coord (x,y) =
+	((float_of_int x)/.100.0,
+	 (float_of_int y)/.100.0,
+	 (float_of_int (getHeight (x,y)))/.100.0) 
+let rec createCoordList = function
+	| [] -> []
+	| c::l ->  (pixel2coord c)::(createCoordList l) 
+let createObj filename list  =
+		let file = 
+			open_out_gen [Open_wronly; Open_creat; Open_trunc] 511 filename in
+		let i = ref 0 in
+		let vector = ref "" in
+		let facet = ref "" in
+		let rec nested = function
+			| [] -> (!vector) ^ (!facet)
+			| (x,y,z):: l -> 
+				if !i mod 3 = 0 then
+						facet := (!facet)^"\nf";
+					
+				vector :=!vector^"\nv "^(string_of_float x)^
+															" "^(string_of_float y)^
+															" "^(string_of_float z);
+				facet := !facet ^" "^(string_of_int !i);
+				i:=!i+1;
+				(nested l)
+		in
+		output_string file ("# Debut du fichier"^filename^"\n"^
+												(nested list)^
+												"\n# Fin du fichier"^filename);
+		close_out file
 
 (* ------- Main ------- *)
 let main () =
@@ -54,10 +84,10 @@ let main () =
 		(* Nous voulons 1 argument *)
 		if Array.length (Sys.argv) < 2 then
 			failwith "Il manque le nom du fichier!";
-		(* Initialisation de SDL *)
+		(* Initialisation de l'interface *)
 		Interface.init ();
 		(* Chargement d'une image *)
-		let img = Sdlloader.load_image Sys.argv.(1) in
+		let img = load_picture Sys.argv.(1) in
 		(* On récupère les dimensions *)
 		let (w, h) = get_dims img in
 		(* Resize la fenêtre *)
@@ -68,7 +98,7 @@ let main () =
 		Interface.showSurface img; 
 		(* Traite l'image *)
 		let breaks = (ImageProcessing.detect_areas img w h) in
-		print_borders_to_file (Sys.argv.(1)^".txt") breaks;
+		createObj (Sys.argv.(1)^".obj") (createCoordList breaks);
 		(* Imprime les bordures sur l'image *)
 		print_borders img breaks;
 		(* Affiche l'image modifiée *)

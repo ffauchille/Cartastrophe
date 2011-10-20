@@ -37,7 +37,9 @@ let rgb_distance (r1, g1, b1) (r2, g2, b2) =
 let lab_distance rgb1 rgb2 =
 	let (l1,a1,b1) = rgb2lab rgb1 in
 	let (l2,a2,b2) = rgb2lab rgb2 in
-	 ( (float_of_int (l1-l2))**2. +. (float_of_int (a1-a2))**2. +. (float_of_int (b1-b2))**2. ) ** 0.5
+	 ( (float_of_int (l1-l2))**2. 
+			+. (float_of_int (a1-a2))**2. 
+			+. (float_of_int (b1-b2))**2. ) ** 0.5
 (* calcul du contrast *)
 let calc_contrast (r1, g1, b1) (r2, g2, b2) = ()
 
@@ -49,7 +51,8 @@ let is_same_area c1 c2 =
 	dr <20 &&dg <20 && db<20 *)
 	 (* let cd = lab_distance c1 c2 in
 	  if cd <> 0. then
-		 print_string ((string_of_color c1)^"-"^(string_of_color c2)^"="^(string_of_float cd)^"\n"); *) 
+		 print_string ((string_of_color c1)^"-"
+		^(string_of_color c2)^"="^(string_of_float cd)^"\n"); *) 
 	(lab_distance c1 c2)<20.0
 
 let detect_areas img w h= (* detecte les différentes zones *)
