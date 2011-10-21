@@ -19,21 +19,6 @@ let rec wait_key () =
 let string_of_coord (x,y) = "("^(string_of_int x)^","^(string_of_int y)^")" 
 let string_of_color (r,g,b) = 
 	"("^(string_of_int r)^","^(string_of_int g)^","^(string_of_int b)^")" 
-
-(* Renvoie un couplet de dimensions *)
-let get_dims img =
-	((Sdlvideo.surface_info img).Sdlvideo.w,
-		(Sdlvideo.surface_info img).Sdlvideo.h)
-
-
-
-(* colore deux pixels en noir en fonction de la liste rÈsultat de          *)
-(* detect_areas                                                            *)
-let rec print_borders img = function
-	| [] -> ()
-	| (x, y):: list -> (Sdlvideo.put_pixel_color img x y (0,0,0));
-			print_borders img list
-
 let print_borders_to_file filename list =
 	let file = open_out_gen [Open_wronly; Open_creat; Open_trunc] 511 filename in
 	let rec nested file = function
@@ -46,37 +31,10 @@ let print_borders_to_file filename list =
 		nested file list;
 		output_string file ("Fin");
 		close_out file
-let getHeight (x,y) = 10
-let pixel2coord (x,y) =
-	((float_of_int x)/.100.0,
-	 (float_of_int y)/.100.0,
-	 (float_of_int (getHeight (x,y)))/.100.0) 
-let rec createCoordList = function
-	| [] -> []
-	| c::l ->  (pixel2coord c)::(createCoordList l) 
-let createObj filename list  =
-		let file = 
-			open_out_gen [Open_wronly; Open_creat; Open_trunc] 511 filename in
-		let i = ref 0 in
-		let vector = ref "" in
-		let facet = ref "" in
-		let rec nested = function
-			| [] -> (!vector) ^ (!facet)
-			| (x,y,z):: l -> 
-				if !i mod 3 = 0 then
-						facet := (!facet)^"\nf";
-					
-				vector :=!vector^"\nv "^(string_of_float x)^
-															" "^(string_of_float y)^
-															" "^(string_of_float z);
-				facet := !facet ^" "^(string_of_int !i);
-				i:=!i+1;
-				(nested l)
-		in
-		output_string file ("# Debut du fichier"^filename^"\n"^
-												(nested list)^
-												"\n# Fin du fichier"^filename);
-		close_out file
+
+
+
+
 
 (* ------- Main ------- *)
 let main () =
@@ -89,7 +47,7 @@ let main () =
 		(* Chargement d'une image *)
 		let img = load_picture Sys.argv.(1) in
 		(* On rÅÈcupÅËre les dimensions *)
-		let (w, h) = get_dims img in
+		let (w, h) = ImageProcessing.get_dims img in
 		(* Resize la fenÍtre *)
 		Interface.setSize w h;
 		(* Donne un nom et un icone ‡ la fenÍtre *)
@@ -97,10 +55,10 @@ let main () =
 		(* Affiche une surface (image non modifiÈ) *) 
 		Interface.showSurface img; 
 		(* Traite l'image *)
-		let breaks = (ImageProcessing.detect_areas img w h) in
-		createObj (Sys.argv.(1)^".obj") (createCoordList breaks);
+		let breaks = (ImageProcessing.detect_areas img) in
+		ObjMaker.createObj (Sys.argv.(1)^".obj") (ObjMaker.createCoordList breaks);
 		(* Imprime les bordures sur l'image *)
-		print_borders img breaks;
+		ImageProcessing.print_borders img breaks;
 		(* Affiche l'image modifiÈe *)
 		Interface.showSurface img;
 		wait_key ();
