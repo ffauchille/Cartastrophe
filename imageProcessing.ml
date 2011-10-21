@@ -115,3 +115,27 @@ let detect_areas img= (* detecte les différentes zones *)
 		done
 	done;
 	!breaks
+let f_i = float_of_int
+let rec pgcd = function
+    | (a,0) -> a
+    | (a,b) -> pgcd (b,a mod b)
+let calc_intersection (w,h) (*i*) =
+    let interval= pgcd (w,h) in
+    let cx = w/interval in
+    let cy = h/interval in
+    let vlist = ref [] in
+    let flist = ref [] in
+    let c = (2*cx-1)*(cy-1)+cx in
+    
+    for i=0 to c do
+	    if i mod 4 = 0 then
+		begin
+		    vlist := ((f_i x)/.2.,(f_i y)/.2.)::!vlist;
+		    flist := (i-4)
+		    i:=!i+1
+		end
+	    vlist := (f_i x,f_i y)::!vlist;
+	    i:=!i+1
+    do
+    rlist
+
