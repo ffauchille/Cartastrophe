@@ -2,12 +2,19 @@ let f_i = float_of_int
 let s_i = string_of_int
 let s_f = string_of_float
 let rec pgcd n m =
+	
   if n > m then pgcd m n
   else if n = 0 then m
        else let r = m mod n in
             pgcd r n
+let getHeight (x,y) interval =(* Printf.printf "%f,%f %u\n" x y interval; *)
+try 
+	Hashtbl.find ImageProcessing.heightHT 
+	(int_of_float ((f_i interval) *.x),int_of_float ((f_i interval) *.y ))
+with Not_found -> 0. 
+(* let getHeight (x,y) interval = (x-.y)*.(x+.y) *) 
 let pp =function i->i:=!i+1 
-let calc_intersection (w,h) (*i*) =
+let calc_intersection (w,h) =
 		
     let interval= 10 in 
     let cx = w/interval 
@@ -25,12 +32,13 @@ let calc_intersection (w,h) (*i*) =
 		in *)
 		
 		(* c=0 r=0 up left*)
-		vlist := (0.,0.,1.0)::!vlist; (*hackfix*)
-		vlist := (0.,0.,1.0)::!vlist; (*1*)
+		vlist := (0.,0.,(getHeight (0.,0.) interval))::!vlist; (*hackfix*)
+		vlist := (0.,0.,(getHeight (0.,0.) interval))::!vlist; (*1*)
+		
 		(* pp i : i initialisé à 2 *)
 		for c = 0 to cy do
 			(* c=c r=0 : up right*) 
-			vlist := (f_i c +.1.,0.0,1.0)::!vlist;
+			vlist := (f_i c +.1.,0.0,(getHeight (f_i c+.1.,0.) interval))::!vlist;
 			pp i;
 			for r = 0 to cx do
 					ur := !i-1;
@@ -49,7 +57,8 @@ let calc_intersection (w,h) (*i*) =
 								else
 									ul := !i-3;
 								(* down left *)
-								vlist := (f_i c,f_i r+.1.,1.0)::!vlist;
+								vlist := (f_i c,f_i r+.1.,
+								(getHeight (f_i c,f_i r+.1.) interval))::!vlist;
 								dl := !i;
 								pp i;
 							end
@@ -60,11 +69,13 @@ let calc_intersection (w,h) (*i*) =
 							end;
 					
 					(* middle center *)
-					vlist := (f_i c+.0.5,f_i r+.0.5,1.0)::!vlist;
+					vlist := (f_i c+.0.5,f_i r+.0.5,
+					(getHeight (f_i c+.0.5,f_i r+.0.5) interval))::!vlist;
 					mc := !i;
 					pp i;
 					(* down right *)
-					vlist := (f_i c+.1.,f_i r+.1.,1.0)::!vlist;
+					vlist := (f_i c+.1.,f_i r+.1.
+					,(getHeight (f_i c+.1.,f_i r+.1.) interval))::!vlist;
 					dr := !i;
 					pp i;
 					
@@ -82,7 +93,7 @@ let calc_intersection (w,h) (*i*) =
     
     (!vlist,!flist)
 
-let getHeight (x,y) = (x-y)*(x-y)
+
 let pixel2coord (x,y,z) =
 	((float_of_int x)/.100.0,
 	 (float_of_int y)/.100.0,
@@ -116,5 +127,5 @@ let createObj filename (vList,fList)  =
 		output_string file ("# Debut du fichier"^
 												(concatVertices vList)^
 												(concatFacets fList)^
-												"\n# Fin du fichier "^filename);
+												"# Fin du fichier "^filename);
 		close_out file
