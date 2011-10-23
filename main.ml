@@ -48,15 +48,17 @@ let main () =
 		let img = load_picture Sys.argv.(1) in
 		(* On récupère les dimensions *)
 		let (w, h) = ImageProcessing.get_dims img in
-		(* Resize la fenêtre *)
+		(* Redimensionne la fenêtre *)
 		Interface.setSize w h;
 		(* Donne un nom et un icone à la fenêtre *)
 		Interface.setCaption "Cartastrophe !" "icon.png";
 		(* Affiche une surface (image non modifié) *) 
 		Interface.showSurface img; 
 		(* Traite l'image *)
+		
 		let breaks = (ImageProcessing.detect_areas img) in
-		ObjMaker.createObj (Sys.argv.(1)^".obj") (ObjMaker.createCoordList breaks);
+		
+		ObjMaker.createObj (Sys.argv.(1)^".obj") (ObjMaker.calc_intersection (w,h));
 		(* Imprime les bordures sur l'image *)
 		ImageProcessing.print_borders img breaks;
 		(* Affiche l'image modifiée *)
