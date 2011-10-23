@@ -55,7 +55,6 @@ let main () =
 		(* Affiche une surface (image non modifié) *) 
 		Interface.showSurface img; 
 		(* Traite l'image *)
-		
 		let breaks = (ImageProcessing.detect_areas img) in
 		
 		ObjMaker.createObj (Sys.argv.(1)^".obj") (ObjMaker.calc_intersection (w,h));

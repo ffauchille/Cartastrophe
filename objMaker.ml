@@ -1,6 +1,7 @@
 let f_i = float_of_int
 let s_i = string_of_int
 let s_f = string_of_float
+let lastHeight = ref 0.
 let rec pgcd n m =
 	
   if n > m then pgcd m n
@@ -9,9 +10,10 @@ let rec pgcd n m =
             pgcd r n
 let getHeight (x,y) interval =(* Printf.printf "%f,%f %u\n" x y interval; *)
 try 
-	Hashtbl.find ImageProcessing.heightHT 
-	(int_of_float ((f_i interval) *.x),int_of_float ((f_i interval) *.y ))
-with Not_found -> 0. 
+	lastHeight := Hashtbl.find ImageProcessing.heightHT 
+	(int_of_float ((f_i interval) *.x),int_of_float ((f_i interval) *.y )); 
+	!lastHeight
+with Not_found -> !lastHeight
 (* let getHeight (x,y) interval = (x-.y)*.(x+.y) *) 
 let pp =function i->i:=!i+1 
 let calc_intersection (w,h) =
@@ -109,8 +111,8 @@ let createObj filename (vList,fList)  =
 				| [] -> "\n"
 				| (x,y,z):: l -> concatVertices l ^
 				"\nv "^(string_of_float x)^
-				" "^(string_of_float y)^
-				" "^(string_of_float z)
+				" "^(string_of_float z)^
+				" "^(string_of_float y)
 				
 		in
 		let rec concatFacets = 

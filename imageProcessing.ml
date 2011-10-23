@@ -85,13 +85,14 @@ let get_dims img =
 
 let detect_areas img= (* detecte les différentes zones *)
 	let breaks = ref [] in
-	let colors = ref [] in
+	
 	let curColor = ref (0,0,0) in
 	let firstColor = (Sdlvideo.get_pixel_color img 0 0) in
 	let lastColor = ref firstColor in
 	let curColorIndex = ref 0 in 
 	let lastColorIndex = ref 0 in 
-	let colorsLength = ref (-1) in
+	let colorsLength = ref 1 in
+	let colors = ref [firstColor] in
 		(* On récupère les dimensions *)
 	let (w, h) = get_dims img in 
 	let z = ref 0. in 
