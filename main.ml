@@ -48,19 +48,26 @@ let main () =
 		let img = load_picture Sys.argv.(1) in
 		(* On rÅÈcupÅËre les dimensions *)
 		let (w, h) = ImageProcessing.get_dims img in
-		(* Resize la fenÍtre *)
+		(* Redimensionne la fenÍtre *)
 		Interface.setSize w h;
 		(* Donne un nom et un icone ‡ la fenÍtre *)
 		Interface.setCaption "Cartastrophe !" "icon.png";
-		(* Affiche une surface (image non modifiÈ) *) 
-		Interface.showSurface img; 
+		
+		
 		(* Traite l'image *)
 		let breaks = (ImageProcessing.detect_areas img) in
-		ObjMaker.createObj (Sys.argv.(1)^".obj") (ObjMaker.createCoordList breaks);
+		
+		ObjMaker.createObj (Sys.argv.(1)^".obj") (ObjMaker.calc_intersection (w,h)
+		!Interface.interval); 
+		
 		(* Imprime les bordures sur l'image *)
 		ImageProcessing.print_borders img breaks;
 		(* Affiche l'image modifiÈe *)
 		Interface.showSurface img;
+		Sdlvideo.save_BMP img (Sys.argv.(1)^"-traite.bmp");
+		Sdlvideo.save_BMP (ImageProcessing.crisscross img (w,h) (!Interface.interval))
+		 (Sys.argv.(1)^"-crisscross.bmp");
+		
 		wait_key ();
 		(* on quitte *)
 		exit 0

@@ -1,6 +1,7 @@
 (* ------- Utils ------- *)
 let rgblabHt: (int*int*int,int*int*int) Hashtbl.t = Hashtbl.create 10 
 let isaHt : ( (int*int*int)*(int*int*int),bool) Hashtbl.t = Hashtbl.create 50
+let heightHT : (int*int,float) Hashtbl.t = Hashtbl.create 300000
 (* Convertit un triplet de couleurs RGB en LAB *)
 let rgb2lab (r,g,b) =
 	try
@@ -35,11 +36,13 @@ let rgb2lab (r,g,b) =
 		(int_of_float (200.*.((h (y/.beta))-.( h (z/.gamma)))))) in
 		Hashtbl.add rgblabHt (r,g,b) lab;
 		lab
-		
+let f_i = float_of_int
 		(* Chiffre entre O et 1 représentant la différence entre les couleurs    *)
 let rgb_distance (r1, g1, b1) (r2, g2, b2) =
-	(* float_of_int (abs(r1 - r2) + abs(g1 - g2) + abs(b1 - b2)) /. 765. *)
-	(abs(r1 - r2) , abs(g1 - g2) , abs(b1 - b2))
+	 ((f_i r1 -. f_i r2)**2. 
+			+. (f_i g1 -. f_i g2)**2. 
+			+. (f_i b1 -. f_i b2)**2.)**0.5  
+	(* (abs(r1 - r2) , abs(g1 - g2) , abs(b1 - b2)) *)
 
 let lab_distance rgb1 rgb2 =
 	let (l1,a1,b1) = rgb2lab rgb1 in
@@ -50,6 +53,16 @@ let lab_distance rgb1 rgb2 =
 (* calcul du contrast *)
 let calc_contrast (r1, g1, b1) (r2, g2, b2) = ()
 
+let crisscross img (w,h) interval = 
+		for x =0 to w-1 do
+			for y =0 to h-1 do
+				if x mod interval = 0 then
+					Sdlvideo.put_pixel_color img x y (0,0,0);
+				if y mod interval = 0 then
+					Sdlvideo.put_pixel_color img x y (0,0,0)
+			done
+	done;
+	img
 (* detecte les couleurs appartenantes à la même zone , utilisant une      *)
 (* fonction de distinction de couleurs                                     *)
 let is_same_color c1 c2 =
@@ -57,7 +70,7 @@ let is_same_color c1 c2 =
 		let isa= Hashtbl.find isaHt (c1,c2) in
 		 isa
 	with Not_found ->  
-		let isa = (lab_distance c1 c2)<20.0 in
+		let isa = (lab_distance c1 c2)<10.0 in
 		Hashtbl.add isaHt (c1,c2) isa;
 		isa
 	
@@ -82,24 +95,31 @@ let get_dims img =
 
 let detect_areas img= (* detecte les différentes zones *)
 	let breaks = ref [] in
-	let colors = ref [] in
+	
 	let curColor = ref (0,0,0) in
-	let lastColor = ref (0,0,0) in
+	let firstColor = (Sdlvideo.get_pixel_color img 0 0) in
+	let lastColor = ref firstColor in
 	let curColorIndex = ref 0 in 
-	let colorsLength = ref (-1) in
-	(* On récupère les dimensions *)
+	let lastColorIndex = ref 0 in 
+	let colorsLength = ref 1 in
+	let colors = ref [firstColor] in
+		(* On récupère les dimensions *)
 	let (w, h) = get_dims img in 
+	let z = ref 0. in 
 	let nested x y= 
 		curColor := (Sdlvideo.get_pixel_color img x y);
+		Hashtbl.add heightHT (x,y) !z; 
 			if not (is_same_color !curColor !lastColor) then
 				begin 
+					lastColorIndex := !curColorIndex;
 					curColorIndex := colorIndex !curColor !colors;
 					if !curColorIndex>(!colorsLength) then 
 						begin
 							colorsLength := !curColorIndex;
 							colors := !curColor::!colors;
 						end;
-					breaks := (x, y, (int_of_float (1.0 *.(lab_distance !curColor (0,0,0) ))))::!breaks;
+					z := f_i !curColorIndex; 
+					breaks := (x, y, !z)::!breaks;
 					lastColor := !curColor;
 				end
 			in 
@@ -108,39 +128,12 @@ let detect_areas img= (* detecte les différentes zones *)
 			nested x y
 		done
 	done;
-	lastColor := (0,0,0);
+	z:=0.;
+	lastColor := firstColor;
 	for y =0 to h-1 do
 		for x =0 to w-1 do
 			nested x y
 		done
 	done;
 	!breaks
-let f_i = float_of_int
-let rec pgcd = function
-    | (a,0) -> a
-    | (a,b) -> pgcd (b,a mod b)
-		
-let calc_intersection (w,h) (*i*) =
-    let interval= pgcd (w,h) in
-    let cx = w/interval in
-    let cy = h/interval in
-    let vlist = ref [] in
-    let flist = ref [] in
-    let c = 2*cx*cy -cy -cx +1 in
-    let q = ref 0.0 in 
-    for i=0 to c do
-			
-	    	match i mod 5 with
-					| 0 -> vlist := (!q,!q)::!vlist;
-					| 1 -> vlist := (!q+.1.,!q)::!vlist;
-					| 2 -> vlist := (!q+.0.5,!q+.0.5)::!vlist;
-			    | 3 -> vlist := (!q,!q+.1.)::!vlist;
-					| 4 -> vlist := (!q+.1.,!q+.1.)::!vlist;
-					| _ -> failwith "L'impossible est arrivé !"
-			    
-			    
-			q:=!q+.f_i interval
-			q
-    done;
-    (vlist,flist)
 

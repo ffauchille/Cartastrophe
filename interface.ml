@@ -1,18 +1,22 @@
+
 let width = ref 800
 let height= ref 600
 let namefile= ref "map-simple.png"
 let namefiletreated= ref "map-simple-traite.bmp"
+let interval = ref 10
+
 (* On crÅÈe la surface d'affichage en doublebuffering *)
-let newDisplay () =(Sdlvideo.set_video_mode (!width) (!height) [`DOUBLEBUF])
+(* let newDisplay () =(Sdlvideo.set_video_mode (!width) (!height) [`DOUBLEBUF])
 let display = ref (newDisplay ())
 
-let setSize w h = width:=w;height:=h;display :=newDisplay () 
+let setSize w h = width:=w;height:=h;display :=newDisplay ()  *)
+let setSize w h = () 
 (* Affiche une image ‡ l'Ècran *)
-let showSurface img = 
+(* let showSurface img = 
 	let d = Sdlvideo.display_format img in
 		Sdlvideo.blit_surface d !display ();
 		Sdlvideo.flip !display
-		
+		 *)
 let setCaption = Sdlwm.set_caption
 (*Ouverture de la fenetre*)
 let window = GWindow.window
@@ -21,6 +25,7 @@ let window = GWindow.window
     ~height:!height
     ~width:!width ()
 (*Cadre principal*)
+
 
 
 (*Permettre l'ajout de widgets dans window*)
@@ -66,27 +71,31 @@ let imagetreatedview = GMisc.image
     ~file:!namefiletreated
     ~packing:frame_image_treated#add ()
     
+(* Suppress warnings *)
+let sw foo = ()
 let help_message () = print_endline "Cliquez sur \"Quitter\" pour quitter"
 (*Bouton d'aide*)
 let help =
     let button= GButton.button
 	~stock:`HELP
 	~packing:bbox#add () in
-    button#connect#clicked ~callback:help_message;
+    (*sw*) (button#connect#clicked ~callback:help_message);
     button
 (*Bouton quitter*)
 let quit =
     let button = GButton.button
 	~stock:`QUIT
 	~packing:bbox#add () in
-    button#connect#clicked ~callback:GMain.quit;
+    (*sw*) (button#connect#clicked ~callback:GMain.quit);
     button
 (* Initialisation SDL,GTK2 et ouverture de la fenetre *)
 let init () = 
 	begin
 		Sdl.init [`EVERYTHING];
 		Sdlevent.enable_events Sdlevent.all_events_mask;
-		window#connect#destroy ~callback:GMain.quit;
+		
+		(*sw*) (GMain.init ());
+		(*sw*) (window#connect#destroy ~callback:GMain.quit);
 		window#show ();
 		GMain.main ()
 	end
