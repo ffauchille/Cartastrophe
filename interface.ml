@@ -1,5 +1,6 @@
 let width = ref 1024
 let height= ref 768
+let namefile= ref "map-simple.png"
 (* On crÅÈe la surface d'affichage en doublebuffering *)
 let newDisplay () =(Sdlvideo.set_video_mode (!width) (!height) [`DOUBLEBUF])
 let display = ref (newDisplay ())
@@ -19,11 +20,12 @@ let window = GWindow.window
     ~height:!height
     ~width:!width ()
 (*Cadre principal*)
+(*
 (* Backing pixmap for drawing area *)
 let backing = ref (GDraw.pixmap 
     ~width:200 
-    ~height:200 ())
-
+    ~height:200 ())*)
+(*
 (* Create a new backing pixmap of the appropriate size *)
 let configure window backing ev =
   let width = GdkEvent.Configure.width ev in
@@ -72,13 +74,20 @@ let expose (drawing_area:GMisc.drawing_area) (backing:GDraw.pixmap ref) ev =
     new GDraw.drawable (drawing_area#misc#window)
   in
   drawing#put_pixmap ~x ~y ~xsrc:x ~ysrc:y ~width ~height !backing#pixmap;
-  false
+  false *)
 (*Permettre l'ajout de widgets dans window*)
 let vbox = GPack.vbox
     ~spacing:10
     ~border_width:10
     ~packing:window#add ()
+
+let frame = GBin.frame
+    ~label: "Image"
+    ~packing:vbox#add ()
+
 (*Insertiona du scrolling*)
+
+
 let scroll = GBin.scrolled_window
     ~height:200
     ~hpolicy:`ALWAYS
@@ -89,13 +98,25 @@ let bbox = GPack.button_box `HORIZONTAL
     ~layout:`SPREAD
     ~packing:(vbox#pack ~expand:false) ()
 
-(*Appels des fonctions draw_brush*)
-let drawing_area = GMisc.drawing_area
+(*Creation d'une frame pour ou l'on affichera l'image *)
+(*let drawing_area = GMisc.drawing_area
     ~width:400
     ~height:300
-    ~packing:(window#add) ()
-
-
+    ~packing:(window#add) () *)
+(*Creation d'une box pour l'image*)
+let imgbox = GPack.box `HORIZONTAL
+    ~spacing: 10
+    ~border_width: 12
+    ~packing: window#add ()
+(*let frame = GBin.frame
+    ~label: "Image"
+    ~packing:vbox#add ()*)
+    
+(*affichage de l'image d'un GMisc.image*)
+let imageview = GMisc.image
+    ~file:!namefile
+    ~packing:frame#add ()
+(**)    
 let help_message () = print_endline "Cliquez sur \"Quitter\" pour quitter"
 (*Bouton d'aide*)
 let help =
