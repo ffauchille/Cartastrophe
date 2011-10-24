@@ -1,6 +1,7 @@
-let width = ref 1024
-let height= ref 768
+let width = ref 800
+let height= ref 600
 let namefile= ref "map-simple.png"
+let namefiletreated= ref "map-simple-traite.bmp"
 (* On crÅÈe la surface d'affichage en doublebuffering *)
 let newDisplay () =(Sdlvideo.set_video_mode (!width) (!height) [`DOUBLEBUF])
 let display = ref (newDisplay ())
@@ -20,74 +21,27 @@ let window = GWindow.window
     ~height:!height
     ~width:!width ()
 (*Cadre principal*)
-(*
-(* Backing pixmap for drawing area *)
-let backing = ref (GDraw.pixmap 
-    ~width:200 
-    ~height:200 ())*)
-(*
-(* Create a new backing pixmap of the appropriate size *)
-let configure window backing ev =
-  let width = GdkEvent.Configure.width ev in
-  let height = GdkEvent.Configure.height ev in
-  let pixmap = GDraw.pixmap 
-    ~width 
-    ~height 
-    ~window () in
-  pixmap#set_foreground `WHITE;
-  pixmap#rectangle 
-    ~x:0 
-    ~y:0 
-    ~width 
-    ~height 
-    ~filled:true ();
-  backing := pixmap;
-  true
-(* Draw a rectangle on the screen *)
-let draw_brush (area:GMisc.drawing_area) (backing:GDraw.pixmap ref) x y =
-  let x = x - 5 in
-  let y = y - 5 in
-  let width = 10 in
-  let height = 10 in
-  let update_rect = Gdk.Rectangle.create 
-    ~x 
-    ~y 
-    ~width 
-    ~height in
-  !backing#set_foreground `BLACK;
-  !backing#rectangle 
-    ~x 
-    ~y 
-    ~width 
-    ~height 
-    ~filled:true ();
-  area#misc#draw (Some update_rect)
-(* Redraw the screen from the backing pixmap *)
-let expose (drawing_area:GMisc.drawing_area) (backing:GDraw.pixmap ref) ev =
-  let area = GdkEvent.Expose.area ev in
-  let x = Gdk.Rectangle.x area in
-  let y = Gdk.Rectangle.y area in
-  let width = Gdk.Rectangle.width area in
-  let height = Gdk.Rectangle.width area in
-  let drawing =
-    drawing_area#misc#realize ();
-    new GDraw.drawable (drawing_area#misc#window)
-  in
-  drawing#put_pixmap ~x ~y ~xsrc:x ~ysrc:y ~width ~height !backing#pixmap;
-  false *)
+
+
 (*Permettre l'ajout de widgets dans window*)
 let vbox = GPack.vbox
-    ~spacing:10
-    ~border_width:10
+    ~spacing:5
+    ~border_width:5
     ~packing:window#add ()
 
-let frame = GBin.frame
-    ~label: "Image"
+let hbox = GPack.hbox
+    ~spacing:5 (* Les enfants sont espacÈs de 5 pixels. *)
+    ~border_width:5 (* La boÓte possËde une bordure de 5 pixels. *)
     ~packing:vbox#add ()
+  
 
+let frame = GBin.frame
+    ~label: "Image treated"
+    ~packing:vbox#add ()
+let frame_image_treated = GBin.frame
+    ~label:"Image not treated"
+    ~packing:hbox#add ()
 (*Insertiona du scrolling*)
-
-
 let scroll = GBin.scrolled_window
     ~height:200
     ~hpolicy:`ALWAYS
@@ -98,25 +52,20 @@ let bbox = GPack.button_box `HORIZONTAL
     ~layout:`SPREAD
     ~packing:(vbox#pack ~expand:false) ()
 
-(*Creation d'une frame pour ou l'on affichera l'image *)
-(*let drawing_area = GMisc.drawing_area
-    ~width:400
-    ~height:300
-    ~packing:(window#add) () *)
 (*Creation d'une box pour l'image*)
-let imgbox = GPack.box `HORIZONTAL
+let imgbox = GPack.box `VERTICAL
     ~spacing: 10
-    ~border_width: 12
+    ~border_width: 5
     ~packing: window#add ()
-(*let frame = GBin.frame
-    ~label: "Image"
-    ~packing:vbox#add ()*)
     
 (*affichage de l'image d'un GMisc.image*)
 let imageview = GMisc.image
     ~file:!namefile
     ~packing:frame#add ()
-(**)    
+let imagetreatedview = GMisc.image
+    ~file:!namefiletreated
+    ~packing:frame_image_treated#add ()
+    
 let help_message () = print_endline "Cliquez sur \"Quitter\" pour quitter"
 (*Bouton d'aide*)
 let help =
