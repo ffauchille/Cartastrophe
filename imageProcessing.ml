@@ -53,6 +53,16 @@ let lab_distance rgb1 rgb2 =
 (* calcul du contrast *)
 let calc_contrast (r1, g1, b1) (r2, g2, b2) = ()
 
+let crisscross img (w,h) interval = 
+		for x =0 to w-1 do
+			for y =0 to h-1 do
+				if x mod interval = 0 then
+					Sdlvideo.put_pixel_color img x y (0,0,0);
+				if y mod interval = 0 then
+					Sdlvideo.put_pixel_color img x y (0,0,0)
+			done
+	done;
+	img
 (* detecte les couleurs appartenantes Å‡ la mÍme zone , utilisant une      *)
 (* fonction de distinction de couleurs                                     *)
 let is_same_color c1 c2 =

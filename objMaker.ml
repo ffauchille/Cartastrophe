@@ -16,9 +16,9 @@ try
 with Not_found -> !lastHeight
 (* let getHeight (x,y) interval = (x-.y)*.(x+.y) *) 
 let pp =function i->i:=!i+1 
-let calc_intersection (w,h) =
+let calc_intersection (w,h) interval =
 		
-    let interval= 10 in 
+    
     let cx = w/interval 
 	    and cy = h/interval 
 	    and vlist = ref [] 

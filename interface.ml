@@ -1,5 +1,6 @@
 let width = ref 1024
 let height= ref 768
+let interval = ref 10
 (* On crÅÈe la surface d'affichage en doublebuffering *)
 let newDisplay () =(Sdlvideo.set_video_mode (!width) (!height) [`DOUBLEBUF])
 let display = ref (newDisplay ())
