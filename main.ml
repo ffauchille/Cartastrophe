@@ -63,7 +63,6 @@ let main () =
 		(* Imprime les bordures sur l'image *)
 		ImageProcessing.print_borders img breaks;
 		(* Affiche l'image modifiée *)
-		Interface.showSurface img;
 		Sdlvideo.save_BMP img (Sys.argv.(1)^"-traite.bmp");
 		Sdlvideo.save_BMP (ImageProcessing.crisscross img (w,h) (!Interface.interval))
 		 (Sys.argv.(1)^"-crisscross.bmp");
