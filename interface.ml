@@ -37,9 +37,6 @@ let hbox = GPack.hbox
 let bbox = GPack.button_box `VERTICAL
     ~layout:`SPREAD
     ~packing:(hbox#pack ~expand:false) ()
-let image_filter =GFile.filter
-    ~name:"Image file"
-    ~patterns:["*.bmp";"*.png";"*.jpg";"*.jpeg"]
 (*Création des différents cadres*)
 (*let frame_image_origin = GBin.frame 
     ~label:"Original Image"
@@ -56,17 +53,21 @@ let open_button = GFile.chooser_button
     ~title:"Choix de la carte"
     ~action:`OPEN
     ~packing:bbox#add ()
+let image_filter =GFile.filter
+    ~name:"Fichier image"
+    ~patterns:["*.bmp";"*.png";"*.jpg";"*.jpeg"]
 let help =
     let button= GButton.button
 	~stock:`HELP
 	~packing:bbox#add () in
+	GMisc.image ~stock:`HELP ~packing: button#set_image ();
     (*sw*) (button#connect#clicked ~callback:GMain.quit);
     button
 let about_button =
   let dlg = GWindow.about_dialog
-    ~authors:["Quatrographes (<quatrographes AT gmail DOT com>)"]
+    ~authors:["Quatrographes (<quatrographes@gmail.com>)"]
     ~copyright:"Copyright © 2011-2012 Cartastrophe Project"
-    ~license:"GNU General Public License v3"
+    ~license:"EPITA 2015 "
     ~version:"42.42"
     ~website:"http://cartastro0.wordpress.com/"
     ~website_label:"Cartastrophe"
@@ -84,6 +85,7 @@ let quit =
     let button = GButton.button
 	~stock:`QUIT
 	~packing:bbox#add () in
+    GMisc.image ~stock:`QUIT ~packing:button#set_image ();
     (button#connect#clicked ~callback:GMain.quit);
     button
 (*Creation d'une box pour l'image*)
@@ -111,5 +113,5 @@ let init () =
 		(*GMain.init ();*)
 		(*sw*) (window#connect#destroy ~callback:GMain.quit);
 		window#show ();
-		GMain.main ()
+		GMain.Main.main ()
 	end
