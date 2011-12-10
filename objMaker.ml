@@ -2,6 +2,7 @@ let f_i = float_of_int
 let s_i = string_of_int
 let s_f = string_of_float
 let lastHeight = ref 0.
+let lastColor = ref (0.,0.,0.)
 let rec pgcd n m =
 	
   if n > m then pgcd m n
@@ -14,13 +15,29 @@ try
 	(int_of_float ((f_i interval) *.x),int_of_float ((f_i interval) *.y )); 
 	!lastHeight
 with Not_found -> !lastHeight
+
+let getColor (x,y) interval =(* Printf.printf "%f,%f %u\n" x y interval; *)
+try 
+    let (r,g,b)= Hashtbl.find ImageProcessing.colorHT 
+	(int_of_float ((f_i interval) *.x),int_of_float ((f_i interval) *.y )) in 
+    lastColor := (((f_i r)/.255.),((f_i g)/.255.),((f_i b)/.255.));
+	!lastColor
+with Not_found -> !lastColor
+let gH=getHeight
+let gC=getColor
 (* let getHeight (x,y) interval = (x-.y)*.(x+.y) *) 
 let pp =function i->i:=!i+1 
+module VertexMap =Map.Make (struct
+       type t = int
+          let compare = Pervasives.compare
+end)
+
 let calc_intersection (w,h) interval =
 		
     
     let cx = w/interval 
 	    and cy = h/interval 
+        and vmap = VertexMap.empty
 	    and vlist = ref [] 
 	    and flist = ref []
 			and ul = ref 0 
@@ -34,13 +51,15 @@ let calc_intersection (w,h) interval =
 		in *)
 		
 		(* c=0 r=0 up left*)
-		vlist := (0.,0.,(getHeight (0.,0.) interval))::!vlist; (*hackfix*)
-		vlist := (0.,0.,(getHeight (0.,0.) interval))::!vlist; (*1*)
+(*		vlist := (0.,0.,(getHeight (0.,0.) interval))::!vlist; (*hackfix*) *)
+        VertexMap.add 1 ((gC (0.,0.) interval),(0.,0.,(getHeight (0.,0.)
+        interval))) vmap; (*1*)
 		
 		(* pp i : i initialisé à 2 *)
 		for c = 0 to cy do
 			(* c=c r=0 : up right*) 
-			vlist := (f_i c +.1.,0.0,(getHeight (f_i c+.1.,0.) interval))::!vlist;
+			VertexMap.add !i ((gC (f_i c+.1.,0.) interval),(f_i c +.1.,0.0,(getHeight (f_i c+.1.,0.)
+            interval))) vmap;
 			pp i;
 			for r = 0 to cx do
 					ur := !i-1;
@@ -59,8 +78,9 @@ let calc_intersection (w,h) interval =
 								else
 									ul := !i-3;
 								(* down left *)
-								vlist := (f_i c,f_i r+.1.,
-								(getHeight (f_i c,f_i r+.1.) interval))::!vlist;
+								VertexMap.add !i ((gC (f_i c,f_i r+.1.)
+                                interval),(f_i c,f_i r+.1.,
+								(getHeight (f_i c,f_i r+.1.) interval))) vmap;
 								dl := !i;
 								pp i;
 							end
@@ -71,13 +91,13 @@ let calc_intersection (w,h) interval =
 							end;
 					
 					(* middle center *)
-					vlist := (f_i c+.0.5,f_i r+.0.5,
-					(getHeight (f_i c+.0.5,f_i r+.0.5) interval))::!vlist;
+					VertexMap.add !i ((gC (f_i c+.0.5,f_i r+.0.5) interval),(f_i c+.0.5,f_i r+.0.5,
+					(getHeight (f_i c+.0.5,f_i r+.0.5) interval))) vmap;
 					mc := !i;
 					pp i;
 					(* down right *)
-					vlist := (f_i c+.1.,f_i r+.1.
-					,(getHeight (f_i c+.1.,f_i r+.1.) interval))::!vlist;
+					VertexMap.add !i ((gC (f_i c+.1.,f_i r+.1.) interval),(f_i c+.1.,f_i r+.1.
+					,(getHeight (f_i c+.1.,f_i r+.1.) interval))) vmap;
 					dr := !i;
 					pp i;
 					
@@ -129,5 +149,5 @@ let createObj filename (vList,fList)  =
 		output_string file ("# Debut du fichier"^
 												(concatVertices vList)^
 												(concatFacets fList)^
-												"# Fin du fichier "^filename);
+												"\n# Fin du fichier "^filename);
 		close_out file
