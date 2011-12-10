@@ -4,7 +4,6 @@
 
 (* ------- Alias ------- *)
 
-let load_picture = Sdlloader.load_image
 
 (* ------- Utils ------- *)
 
@@ -31,43 +30,33 @@ let print_borders_to_file filename list =
 		nested file list;
 		output_string file ("Fin");
 		close_out file
+(*
+(*Chargement d'une image *)
+let image_processing filename = 
+    let img = load_picture filename in
+(* On rÅÈcupÅËre les dimensions *)
+    let (w, h) = ImageProcessing.get_dims img in
+(* Traite l'image *)
+    let breaks = (ImageProcessing.detect_areas img) in
+    begin   
+    ObjMaker.createObj (filename^".obj") (ObjMaker.calc_intersection (w,h)
+    !Interface.interval); 
+    	(* Imprime les bordures sur l'image *)
+    ImageProcessing.print_borders img breaks;
+    	(* Affiche l'image modifiÈe *)
+    Sdlvideo.save_BMP img (filename^"-traite.bmp");
+    Sdlvideo.save_BMP (ImageProcessing.crisscross img (w,h) (!Interface.interval))
+    (filename^"-crisscross.bmp");
+    end		
 
 
-
-
+*)
 
 (* ------- Main ------- *)
 let main () =
 	begin
-		(* Nous voulons 1 argument *)
-		if Array.length (Sys.argv) < 2 then
-			failwith "Il manque le nom du fichier!";
 		(* Initialisation de l'interface *)
 		Interface.init ();
-		(* Chargement d'une image *)
-		let img = load_picture Sys.argv.(1) in
-		(* On rÅÈcupÅËre les dimensions *)
-		let (w, h) = ImageProcessing.get_dims img in
-		(* Redimensionne la fenÍtre *)
-		Interface.setSize w h;
-		(* Donne un nom et un icone ‡ la fenÍtre *)
-		Interface.setCaption "Cartastrophe !" "icon.png";
-		
-		
-		(* Traite l'image *)
-		let breaks = (ImageProcessing.detect_areas img) in
-		
-		ObjMaker.createObj (Sys.argv.(1)^".obj") (ObjMaker.calc_intersection (w,h)
-		!Interface.interval); 
-		
-		(* Imprime les bordures sur l'image *)
-		ImageProcessing.print_borders img breaks;
-		(* Affiche l'image modifiÈe *)
-		Sdlvideo.save_BMP img (Sys.argv.(1)^"-traite.bmp");
-		Sdlvideo.save_BMP (ImageProcessing.crisscross img (w,h) (!Interface.interval))
-		 (Sys.argv.(1)^"-crisscross.bmp");
-		
-		wait_key ();
 		(* on quitte *)
 		exit 0
 	end
