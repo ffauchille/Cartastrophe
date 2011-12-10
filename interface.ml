@@ -18,23 +18,6 @@ let setSize w h = width:=w;height:=h;display :=newDisplay () *)
 (*Chargement d'une image *)
 let load_picture = Sdlloader.load_image
 
-let image_processing filename = 
-    let img = load_picture filename in
-(* On récupère les dimensions *)
-    let (w, h) = ImageProcessing.get_dims img in
-(* Traite l'image *)
-    let breaks = (ImageProcessing.detect_areas img) in
-    begin
-    ObjMaker.createObj (filename^".obj") (ObjMaker.calc_intersection (w,h)
-    !interval); 
-    	(* Imprime les bordures sur l'image *)
-    ImageProcessing.print_borders img breaks;
-    	(* Affiche l'image modifiée *)
-    Sdlvideo.save_BMP img (filename^"-traite.bmp");
-    Sdlvideo.save_BMP (ImageProcessing.crisscross img (w,h) (!interval))
-    (filename^"-crisscross.bmp");
-    filenameimage := filename;
-    end		
 let setCaption = Sdlwm.set_caption
 (*string of stringoption*)
 (*Ouverture de la fenetre*)
@@ -74,19 +57,9 @@ exception IsNone
 let s_of_s_o = function
     | Some x -> x
     | _ -> raise IsNone
-let may_print btn () = Gaux.may image_processing btn#filename
 let image_filter =GFile.filter
     ~name:"Fichier image"
     ~patterns:["*.bmp";"*.png";"*.jpg";"*.jpeg"] ()
-let map_button = 
-let button = GFile.chooser_button
-    ~title:"Choix de la carte"
-    ~action:`OPEN
-    (*~set_filter:image_filter*)
-    ~packing:bbox#add () in
-    (button#connect#selection_changed (may_print button));
-GMisc.image ~file:!filenameimage ~packing:frame_image_treated#add();
-    button
 (*let help_message _=
   let dlg _= GWindow.message_dialog
     ~message:"1. Cliquez sur le premier bouton, celui permettant de selection 
@@ -148,6 +121,40 @@ let area = GlGtk.area [`DOUBLEBUFFER;`RGBA;`DEPTH_SIZE 16;`BUFFER_SIZE 16]
     ~height:(2*(!height)/3) 
     ~width:(2*(!width)/3)
     ~packing:frame_visualisation#add ()
+
+let image_processing filename = 
+    let img = load_picture filename in
+(* On récupère les dimensions *)
+    let (w, h) = ImageProcessing.get_dims img in
+(* Traite l'image *)
+    let breaks = (ImageProcessing.detect_areas img) in
+    begin
+    (* ObjMaker.createObj (filename^".obj") (ObjMaker.calc_intersection (w,h)
+    !interval); *)
+    let (vmap,flist) = ObjMaker.calc_intersection (w,h) !interval
+    in
+    Fridi.display area (2*(!height)/3) (2*(!width)/3) vmap flist;
+    	(* Imprime les bordures sur l'image *)
+    ImageProcessing.print_borders img breaks;
+    	(* Affiche l'image modifiée *)
+    Sdlvideo.save_BMP img (filename^"-traite.bmp");
+    Sdlvideo.save_BMP (ImageProcessing.crisscross img (w,h) (!interval))
+    (filename^"-crisscross.bmp");
+    filenameimage := filename;
+
+    end		
+
+let may_print btn () = Gaux.may image_processing btn#filename
+
+let map_button = 
+let button = GFile.chooser_button
+    ~title:"Choix de la carte"
+    ~action:`OPEN
+    (*~set_filter:image_filter*)
+    ~packing:bbox#add () in
+    (button#connect#selection_changed (may_print button));
+GMisc.image ~file:!filenameimage ~packing:frame_image_treated#add();
+    button
 (* Suppress warnings *)
 let sw foo = ()
 (*(*image de fond*)
