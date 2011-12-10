@@ -114,26 +114,35 @@ let quit =
     ~packing: window#add () *)
     
 (*affichage de l'image d'un GMisc.image*)
-let imageview = GMisc.image
+let imageview foo = GMisc.image
     ~file:!filenameimage
     ~packing:frame_image_treated#add ()
-let area = GlGtk.area [`DOUBLEBUFFER;`RGBA;`DEPTH_SIZE 16;`BUFFER_SIZE 16]
+let area = 
+    let a =GlGtk.area [`DOUBLEBUFFER;`RGBA;`DEPTH_SIZE 16;`BUFFER_SIZE 16]
     ~height:(2*(!height)/3) 
     ~width:(2*(!width)/3)
-    ~packing:frame_visualisation#add ()
-
+    ~packing:frame_visualisation#add () in
+    a#event#add [`KEY_PRESS];
+    
+    window#event#connect#key_press ~callback:
+    begin fun ev ->
+      let key = GdkEvent.Key.keyval ev in
+      if key = GdkKeysyms._Escape then window#destroy ();
+      true
+    end;
+    a
 let image_processing filename = 
     let img = load_picture filename in
 (* On récupère les dimensions *)
     let (w, h) = ImageProcessing.get_dims img in
 (* Traite l'image *)
     let breaks = (ImageProcessing.detect_areas img) in
-    begin
     (* ObjMaker.createObj (filename^".obj") (ObjMaker.calc_intersection (w,h)
     !interval); *)
     let (vmap,flist) = ObjMaker.calc_intersection (w,h) !interval
     in
-    Fridi.display area (2*(!height)/3) (2*(!width)/3) vmap flist;
+    begin
+    (Fridi.display (area) (2*(!height)/3) (2*(!width)/3) vmap flist); 
     	(* Imprime les bordures sur l'image *)
     ImageProcessing.print_borders img breaks;
     	(* Affiche l'image modifiée *)
@@ -142,7 +151,7 @@ let image_processing filename =
     (filename^"-crisscross.bmp");
     filenameimage := filename;
     imageview ();
-    end		
+    end
 
 let may_print btn () = Gaux.may image_processing btn#filename
 
@@ -155,6 +164,8 @@ let button = GFile.chooser_button
     (button#connect#selection_changed (may_print button));
 (*GMisc.image ~file:!filenameimage ~packing:frame_image_treated#add();*)
     button
+
+
 (* Suppress warnings *)
 let sw foo = ()
 (*(*image de fond*)

@@ -113,7 +113,7 @@ let calc_intersection (w,h) interval =
 				done
 			done;
     
-    (!vlist,!flist)
+    (vmap,!flist)
 
 
 let pixel2coord (x,y,z) =
