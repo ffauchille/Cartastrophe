@@ -28,7 +28,7 @@ let initGL () =
 
   GlMisc.hint `perspective_correction `nicest
 module VertexMap = Map.Make(Int32)
-let drawMap area vmap vlist =
+let drawMap area vmap flist =
     let f i= 
         let (c,vx) = 
         try
@@ -47,7 +47,7 @@ let drawMap area vmap vlist =
   
   GlDraw.begins `triangles;
 
-  List.iter f vlist;
+  List.iter f flist;
 
   GlDraw.ends ();
 
@@ -55,96 +55,24 @@ let drawMap area vmap vlist =
 
   area#swap_buffers ()
 
-let drawGLScene area () =
-  GlClear.clear [`color; `depth];
-  GlMat.load_identity ();
-  GlMat.translate ~x:(-1.5) ~y:0.0 ~z:(-6.0) ();
-  
-  GlMat.rotate ~angle:!rtri ~x:0.0 ~y:1.0 ~z:0.0 ();
-  
-  GlDraw.begins `triangles;
-
-  GlDraw.color (1.0, 0.0, 0.0);
-  GlDraw.vertex3 (0.0, 1.0, 0.0);
-  GlDraw.color (0.0, 1.0, 0.0);
-  GlDraw.vertex3 (-1.0, -1.0, 1.0);
-  GlDraw.color (0.0, 0.0, 1.0);
-  GlDraw.vertex3 (1.0, -1.0, 1.0);
-
-  GlDraw.color (1.0, 0.0, 0.0);
-  GlDraw.vertex3 (0.0, 1.0, 0.0);
-  GlDraw.color (0.0, 0.0, 1.0);
-  GlDraw.vertex3 (1.0, -1.0, 1.0);
-  GlDraw.color (0.0, 1.0, 0.0);
-  GlDraw.vertex3 (1.0, -1.0, -1.0);
-
-  GlDraw.color (1.0, 0.0, 0.0);
-  GlDraw.vertex3 (0.0, 1.0, 0.0);
-  GlDraw.color (0.0, 1.0, 0.0);
-  GlDraw.vertex3 (1.0, -1.0, -1.0);
-  GlDraw.color (0.0, 0.0, 1.0);
-  GlDraw.vertex3 (-1.0, -1.0, -1.0);
-
-  GlDraw.color (1.0, 0.0, 0.0);
-  GlDraw.vertex3 (0.0, 1.0, 0.0);
-  GlDraw.color (0.0, 0.0, 1.0);
-  GlDraw.vertex3 (-1.0, -1.0, -1.0);
-  GlDraw.color (0.0, 1.0, 0.0);
-  GlDraw.vertex3 (-1.0, -1.0, 1.0);
-
-  GlDraw.ends ();
-
-  GlMat.load_identity ();
-  GlMat.translate ~x:1.5 ~y:0.0 ~z:(-7.0) ();
-  GlMat.rotate ~angle:!rquad ~x:1.0 ~y:1.0 ~z:1.0 ();
-  
-  GlDraw.begins `quads;
-
-  GlDraw.color (0.0, 1.0, 0.0);
-  GlDraw.vertex3 (1.0, -1.0, -1.0);
-  GlDraw.vertex3 (-1.0, 1.0, -1.0);
-  GlDraw.vertex3 (-1.0, 1.0, 1.0);
-  GlDraw.vertex3 (1.0, 1.0, 1.0);
-
-  GlDraw.color (1.0, 0.5, 0.0);
-  GlDraw.vertex3 (1.0, -1.0, 1.0);
-  GlDraw.vertex3 (-1.0, -1.0, 1.0);
-  GlDraw.vertex3 (-1.0, -1.0, -1.0);
-  GlDraw.vertex3 (1.0, -1.0, -1.0);
-
-  GlDraw.color (1.0, 0.0, 0.0);
-  GlDraw.vertex3 (1.0, 1.0, 1.0);
-  GlDraw.vertex3 (-1.0, 1.0, 1.0);
-  GlDraw.vertex3 (-1.0, -1.0, 1.0);
-  GlDraw.vertex3 (1.0, -1.0, 1.0);
-
-  GlDraw.color (1.0, 1.0, 0.0);
-  GlDraw.vertex3 (1.0, -1.0, -1.0);
-  GlDraw.vertex3 (-1.0, -1.0, -1.0);
-  GlDraw.vertex3 (-1.0, 1.0, -1.0);
-  GlDraw.vertex3 (1.0, 1.0, -1.0);
-
-  GlDraw.color (0.0, 0.0, 1.0);
-  GlDraw.vertex3 (-1.0, 1.0, 1.0);
-  GlDraw.vertex3 (-1.0, 1.0, -1.0);
-  GlDraw.vertex3 (-1.0, -1.0, -1.0);
-  GlDraw.vertex3 (-1.0, -1.0, 1.0);
-
-  GlDraw.color (1.0, 0.0, 1.0);
-  GlDraw.vertex3 (1.0, 1.0, -1.0);
-  GlDraw.vertex3 (1.0, 1.0, 1.0);
-  GlDraw.vertex3 (1.0, -1.0, 1.0);
-  GlDraw.vertex3 (1.0, -1.0, -1.0);
-
-  GlDraw.ends ();
-
-  rtri := !rtri +. 0.2;
-  rquad := !rquad -. 0.15;
-
-  area#swap_buffers ()
 
 let killGLWindow () =
   () (* do nothing *)
+
+let display area width height vmap flist=
+  GMain.Timeout.add ~ms:20 ~callback:
+  begin fun () ->
+       drawGLScene area (); true
+  end;
+  area#connect#display ~callback:(drawMap area vmap flist);
+  area#connect#reshape ~callback:resizeGLScene;
+
+  area#connect#realize ~callback:
+    begin fun () ->
+      initGL ();
+      resizeGLScene ~width ~height
+    end;
+
 
 let createGLWindow title width height bits fullscreen =
   let w = GWindow.window ~title:title () in
@@ -177,7 +105,7 @@ let createGLWindow title width height bits fullscreen =
   w#show ();
 
   w
-let _ =
+let display =
       let w = createGLWindow "Tutorial 5" 640 480 16 false in
         GMain.Main.main ()
 
