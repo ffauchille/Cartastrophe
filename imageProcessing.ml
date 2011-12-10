@@ -2,6 +2,7 @@
 let rgblabHt: (int*int*int,int*int*int) Hashtbl.t = Hashtbl.create 10 
 let isaHt : ( (int*int*int)*(int*int*int),bool) Hashtbl.t = Hashtbl.create 50
 let heightHT : (int*int,float) Hashtbl.t = Hashtbl.create 300000
+let colorHT : (int*int,int*int*int) Hashtbl.t = Hashtbl.create 300000
 (* Convertit un triplet de couleurs RGB en LAB *)
 let rgb2lab (r,g,b) =
 	try
@@ -109,6 +110,7 @@ let detect_areas img= (* detecte les diffÅÈrentes zones *)
 	let nested x y= 
 		curColor := (Sdlvideo.get_pixel_color img x y);
 		Hashtbl.add heightHT (x,y) !z; 
+        Hashtbl.add colorHT (x,y) !curColor;
 			if not (is_same_color !curColor !lastColor) then
 				begin 
 					lastColorIndex := !curColorIndex;
