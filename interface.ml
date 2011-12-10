@@ -114,9 +114,9 @@ let quit =
     ~packing: window#add () *)
     
 (*affichage de l'image d'un GMisc.image*)
-(*let imageview = GMisc.image
+let imageview = GMisc.image
     ~file:!filenameimage
-    ~packing:frame_image_treated#add ()*)
+    ~packing:frame_image_treated#add ()
 let area = GlGtk.area [`DOUBLEBUFFER;`RGBA;`DEPTH_SIZE 16;`BUFFER_SIZE 16]
     ~height:(2*(!height)/3) 
     ~width:(2*(!width)/3)
@@ -141,7 +141,7 @@ let image_processing filename =
     Sdlvideo.save_BMP (ImageProcessing.crisscross img (w,h) (!interval))
     (filename^"-crisscross.bmp");
     filenameimage := filename;
-
+    imageview ();
     end		
 
 let may_print btn () = Gaux.may image_processing btn#filename
@@ -153,7 +153,7 @@ let button = GFile.chooser_button
     (*~set_filter:image_filter*)
     ~packing:bbox#add () in
     (button#connect#selection_changed (may_print button));
-GMisc.image ~file:!filenameimage ~packing:frame_image_treated#add();
+(*GMisc.image ~file:!filenameimage ~packing:frame_image_treated#add();*)
     button
 (* Suppress warnings *)
 let sw foo = ()
