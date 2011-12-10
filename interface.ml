@@ -144,7 +144,9 @@ let quit =
 (*let imageview = GMisc.image
     ~file:!filenameimage
     ~packing:frame_image_treated#add ()*)
-let imagetreated =  GMisc.drawing_area
+let area = GlGtk.area [`DOUBLEBUFFER;`RGBA;`DEPTH_SIZE 16;`BUFFER_SIZE 16]
+    ~height:(2*(!height)/3) 
+    ~width:(2*(!width)/3)
     ~packing:frame_visualisation#add ()
 (* Suppress warnings *)
 let sw foo = ()

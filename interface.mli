@@ -19,6 +19,5 @@ val image_filter : GFile.filter
 val map_button : GFile.chooser_button
 val about_button : GButton.button
 val quit : GButton.button
-val imagetreated : GMisc.drawing_area
 val sw : 'a -> unit
 val init : unit -> unit
