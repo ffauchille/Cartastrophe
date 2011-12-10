@@ -16,9 +16,9 @@ val s_of_s_o : 'a option -> 'a
 val image_filter : GFile.filter
 val about_button : GButton.button
 val quit : GButton.button
-val imageview : 'a -> GMisc.image
+val image : GMisc.image
 val area : GlGtk.area
-val image_processing : string -> GMisc.image
+val image_processing : string -> unit
 val may_print : < filename : string option; .. > -> unit -> unit
 val map_button : GFile.chooser_button
 val sw : 'a -> unit

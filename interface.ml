@@ -114,16 +114,16 @@ let quit =
     ~packing: window#add () *)
     
 (*affichage de l'image d'un GMisc.image*)
-let imageview foo = GMisc.image
+let image = GMisc.image
     ~file:!filenameimage
     ~packing:frame_image_treated#add ()
 let area = 
-    let a =GlGtk.area [`DOUBLEBUFFER;`RGBA;`DEPTH_SIZE 16;`BUFFER_SIZE 16]
+    let a = GlGtk.area [`DOUBLEBUFFER;`RGBA;`DEPTH_SIZE 16;`BUFFER_SIZE 16]
     ~height:(2*(!height)/3) 
     ~width:(2*(!width)/3)
-    ~packing:frame_visualisation#add () in
+    ~packing:frame_visualisation#add ()
+     in
     a#event#add [`KEY_PRESS];
-    
     window#event#connect#key_press ~callback:
     begin fun ev ->
       let key = GdkEvent.Key.keyval ev in
@@ -133,24 +133,24 @@ let area =
     a
 let image_processing filename = 
     let img = load_picture filename in
-(* On récupère les dimensions *)
+    (* On récupère les dimensions *)
     let (w, h) = ImageProcessing.get_dims img in
-(* Traite l'image *)
+    (* Traite l'image *)
     let breaks = (ImageProcessing.detect_areas img) in
     (* ObjMaker.createObj (filename^".obj") (ObjMaker.calc_intersection (w,h)
     !interval); *)
     let (vmap,flist) = ObjMaker.calc_intersection (w,h) !interval
     in
     begin
-    (Fridi.display (area) (2*(!height)/3) (2*(!width)/3) vmap flist); 
-    	(* Imprime les bordures sur l'image *)
+    (Fridi.display area (2*(!height)/3) (2*(!width)/3) vmap flist); 
+   	(* Imprime les bordures sur l'image *)
     ImageProcessing.print_borders img breaks;
-    	(* Affiche l'image modifiée *)
-    Sdlvideo.save_BMP img (filename^"-traite.bmp");
-    Sdlvideo.save_BMP (ImageProcessing.crisscross img (w,h) (!interval))
-    (filename^"-crisscross.bmp");
+    (* Affiche l'image modifiée *)
+    (* Sdlvideo.save_BMP img (filename^"-traite.bmp");*)
+    (* Sdlvideo.save_BMP (ImageProcessing.crisscross img (w,h) (!interval))
+    (filename^"-crisscross.bmp"); *)
     filenameimage := filename;
-    imageview ();
+    image#set_file filename;
     end
 
 let may_print btn () = Gaux.may image_processing btn#filename

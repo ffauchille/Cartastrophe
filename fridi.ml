@@ -27,7 +27,52 @@ let initGL () =
 
   GlMisc.hint `perspective_correction `nicest
 (* module VertexMap = Map.Make(Int32) *)
-let drawMap area vmap flist ()=
+let drawMap area foo bar () =
+  GlClear.clear [`color; `depth];
+  GlMat.load_identity ();
+  GlMat.translate ~x:(-1.5) ~y:0.0 ~z:(-6.0) ();
+  
+  GlMat.rotate ~angle:!rtri ~x:0.0 ~y:1.0 ~z:0.0 ();
+  
+  GlDraw.begins `triangles;
+
+  GlDraw.color (1.0, 0.0, 0.0);
+  GlDraw.vertex3 (0.0, 1.0, 0.0);
+  GlDraw.color (0.0, 1.0, 0.0);
+  GlDraw.vertex3 (-1.0, -1.0, 1.0);
+  GlDraw.color (0.0, 0.0, 1.0);
+  GlDraw.vertex3 (1.0, -1.0, 1.0);
+
+  GlDraw.color (1.0, 0.0, 0.0);
+  GlDraw.vertex3 (0.0, 1.0, 0.0);
+  GlDraw.color (0.0, 0.0, 1.0);
+  GlDraw.vertex3 (1.0, -1.0, 1.0);
+  GlDraw.color (0.0, 1.0, 0.0);
+  GlDraw.vertex3 (1.0, -1.0, -1.0);
+
+  GlDraw.color (1.0, 0.0, 0.0);
+  GlDraw.vertex3 (0.0, 1.0, 0.0);
+  GlDraw.color (0.0, 1.0, 0.0);
+  GlDraw.vertex3 (1.0, -1.0, -1.0);
+  GlDraw.color (0.0, 0.0, 1.0);
+  GlDraw.vertex3 (-1.0, -1.0, -1.0);
+
+  GlDraw.color (1.0, 0.0, 0.0);
+  GlDraw.vertex3 (0.0, 1.0, 0.0);
+  GlDraw.color (0.0, 0.0, 1.0);
+  GlDraw.vertex3 (-1.0, -1.0, -1.0);
+  GlDraw.color (0.0, 1.0, 0.0);
+  GlDraw.vertex3 (-1.0, -1.0, 1.0);
+
+  GlDraw.ends ();
+
+  rtri := !rtri +. 0.2;
+  area#swap_buffers ()
+  
+  
+
+
+let _drawMap area vmap flist ()=
     let f i=
         let (c,vx) =
         try
@@ -52,7 +97,7 @@ let drawMap area vmap flist ()=
 
   rtri := !rtri +. 0.2;
 
-  area#swap_buffers  
+  area#swap_buffers ()
   
 
 
@@ -62,16 +107,17 @@ let killGLWindow () =
 let display area width height vmap flist=
   GMain.Timeout.add ~ms:20 ~callback:
   begin fun () ->
-       drawMap area vmap flist (); true
+     drawMap area vmap flist ();
+     true
   end;
-  area#connect#display ~callback:(drawMap area vmap flist ());
-  area#connect#reshape ~callback:resizeGLScene;
 
+  area#connect#display ~callback:(drawMap area vmap flist);
+  area#connect#reshape ~callback:resizeGLScene;
   area#connect#realize ~callback:
     begin fun () ->
       initGL ();
       resizeGLScene ~width ~height
-    end;
-    ()
+    end
+
 
 
