@@ -1,5 +1,8 @@
+module Vm = ObjMaker.VertexMap
 let rtri = ref 0.0
-let zoom = ref 0.
+let zoom = ref 70.0
+let vmap   = ref Vm.empty
+let flist  = ref []
 let resizeGLScene ~width ~height =
   let ok_height =
     if height = 0 then 1 else height in
@@ -9,12 +12,19 @@ let resizeGLScene ~width ~height =
   GlMat.mode `projection;
   GlMat.load_identity ();
   
-  GluMat.perspective ~fovy:70.0
+  GluMat.perspective ~fovy:!zoom
     ~aspect:((float_of_int width)/.(float_of_int ok_height)) ~z:(0.1, 100.0);
     
   GlMat.mode `modelview;
   GlMat.load_identity ()
-module Vm = ObjMaker.VertexMap 
+let memoize f =
+    let display_list = ref None in
+    fun () -> match !display_list with
+    | Some list -> GlList.call list
+    | None ->
+        display_list := Some (GlList.create `compile);
+        f();
+        GlList.ends () 
 let test () = 
     let vmap=ref Vm.empty and
     flist=ref [] in
@@ -51,29 +61,31 @@ let initGL () =
 
   GlMisc.hint `perspective_correction `nicest
 (* module VertexMap = Map.Make(Int32) *)
-
-let drawMap area vmap flist ()=
+let drawMap () =
     let f i=
         let (c,vx) =
         try
-            ObjMaker.VertexMap.find i vmap
+            ObjMaker.VertexMap.find i !vmap
         with Not_found -> ((0.,0.,0.),(0.,0.,0.)) 
         in
         GlDraw.color c;
         GlDraw.vertex3 vx; 
     in
     let g (i,j,k) = (f i);(f j);(f k) in
+  GlDraw.begins `triangles;
+
+  List.iter g !flist;
+
+  GlDraw.ends (); ()
+let drawMap = memoize drawMap
+
+let drawScene area ()=
   GlClear.clear [`color; `depth];
   GlMat.load_identity ();
   GlMat.translate ~x:(-1.5) ~y:0.0 ~z:(-6.0) ();
   GlMat.rotate ~angle:!rtri ~x:0.0 ~y:1.0 ~z:0.0 ();
   
-  GlDraw.begins `triangles;
-
-  List.iter g flist;
-
-  GlDraw.ends ();
-
+  drawMap ();
   rtri := !rtri +. 0.2;
 
   area#swap_buffers ()
@@ -83,19 +95,21 @@ let drawMap area vmap flist ()=
 let killGLWindow () =
   () (* do nothing *)
 let sw foo = ()
-let display area width height vmap flist=
-(*    let (vmap,flist) = test () in
+let display area width height _vmap _flist=
+    (* let (_vmap,_flist) = test () in 
     let display_keys key value= print_int key in
-    Vm.iter display_keys vmap;
-    if Vm.is_empty vmap then
+    Vm.iter display_keys _vmap;
+    if Vm.is_empty _vmap then
         print_string "VMAP EST VIDE !!!";*)
+    vmap:=_vmap;
+    flist:=_flist;
   sw (GMain.Timeout.add ~ms:100 ~callback:
   begin fun () ->
-     drawMap area vmap flist ();
+     drawScene area ();
      true
   end;);
 
-  area#connect#display ~callback:(drawMap area vmap flist);
+  area#connect#display ~callback:(drawScene area);
   area#connect#reshape ~callback:resizeGLScene;
   area#connect#realize ~callback:
     begin fun () ->

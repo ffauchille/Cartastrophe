@@ -4,9 +4,9 @@ val s_f : float -> string
 val lastHeight : float ref
 val lastColor : (float * float * float) ref
 val pgcd : int -> int -> int
-val getHeight : float * float -> int -> float
+val getHeight : float * float * float -> float
 val getColor : float * float -> int -> float * float * float
-val gH : float * float -> int -> float
+val gH : float * float * float -> float
 val gC : float * float -> int -> float * float * float
 val pp : int ref -> unit
 module VertexMap :

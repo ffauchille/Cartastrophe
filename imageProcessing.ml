@@ -1,8 +1,15 @@
 (* ------- Utils ------- *)
 let rgblabHt: (int*int*int,int*int*int) Hashtbl.t = Hashtbl.create 10 
 let isaHt : ( (int*int*int)*(int*int*int),bool) Hashtbl.t = Hashtbl.create 50
-let heightHT : (int*int,float) Hashtbl.t = Hashtbl.create 300000
-let colorHT : (int*int,int*int*int) Hashtbl.t = Hashtbl.create 300000
+let colors = ref []
+let msk=Int32.of_int 2 
+let image = ref ((Sdlvideo.create_RGB_surface [] ~w:0 ~h:0 ~bpp:8 ~rmask:msk
+~gmask:msk ~bmask:msk ~amask:msk) )
+(* Renvoie un couplet de dimensions *)
+let get_dims img =
+	((Sdlvideo.surface_info img).Sdlvideo.w,
+		(Sdlvideo.surface_info img).Sdlvideo.h)
+let w = ref 0 and h =ref 0
 (* Convertit un triplet de couleurs RGB en LAB *)
 let rgb2lab (r,g,b) =
 	try
@@ -74,66 +81,77 @@ let is_same_color c1 c2 =
 		let isa = (lab_distance c1 c2)<10.0 in
 		Hashtbl.add isaHt (c1,c2) isa;
 		isa
-	
 let colorIndex c1 list =
 	let rec nested i=   
 		function 
-		| [] -> i
+		| [] -> i+1
 		| c2::cList -> if (is_same_color c1 c2)  then i else (nested (i+1) cList) 
 	in
 		nested 0 list
+let getColorAt (x,y) = 
+    (* if x>=w || y>=h then
+        begin print_string "color nf";raise Not_found end
+    else*) (Sdlvideo.get_pixel_color !image x y)
+let getHeightFor color =
+    (* let rec count i c = (function
+        | [] -> print_string "height nf";raise Not_found
+        | c1::l when c=c1 -> i
+        | c1::l -> count (i+1) c l)
+    in*)
+   (* if List.length !colors=0 then
+        print_string "LISTE VIDE";*)
+    (*(count 0 color !colors)*)
+    colorIndex color !colors
+
+	
 (* colore deux pixels en noir en fonction de la liste résultat de          *)
 (* detect_areas                                                            *)
 let rec print_borders img = function
 	| [] -> ()
 	| (x, y,_):: list -> (Sdlvideo.put_pixel_color img x y (0,0,0));
 			print_borders img list
-(* Renvoie un couplet de dimensions *)
-let get_dims img =
-	((Sdlvideo.surface_info img).Sdlvideo.w,
-		(Sdlvideo.surface_info img).Sdlvideo.h)
-
 
 let detect_areas img= (* detecte les différentes zones *)
+    image := img;
+    let (width,height)=get_dims img in
+
 	let breaks = ref [] in
 	
 	let curColor = ref (0,0,0) in
 	let firstColor = (Sdlvideo.get_pixel_color img 0 0) in
 	let lastColor = ref firstColor in
 	let curColorIndex = ref 0 in 
-	let lastColorIndex = ref 0 in 
+	(* let lastColorIndex = ref 0 in *)
 	let colorsLength = ref 1 in
-	let colors = ref [firstColor] in
-		(* On récupère les dimensions *)
-	let (w, h) = get_dims img in 
-	let z = ref 0. in 
+	(* On récupère les dimensions *)
+	(*let (w, h) = get_dims img in *)
+    w:=width;
+    h:=height;
+    colors := firstColor::!colors;
 	let nested x y= 
 		curColor := (Sdlvideo.get_pixel_color img x y);
-		Hashtbl.add heightHT (x,y) !z; 
-        Hashtbl.add colorHT (x,y) !curColor;
 			if not (is_same_color !curColor !lastColor) then
 				begin 
-					lastColorIndex := !curColorIndex;
+					(*lastColorIndex := !curColorIndex;*)
 					curColorIndex := colorIndex !curColor !colors;
 					if !curColorIndex>(!colorsLength) then 
 						begin
 							colorsLength := !curColorIndex;
 							colors := !curColor::!colors;
 						end;
-					z := f_i !curColorIndex; 
-					breaks := (x, y, !z)::!breaks;
+					breaks := (x, y, !curColorIndex)::!breaks;
 					lastColor := !curColor;
 				end
 			in 
-	for x =0 to w-1 do
-		for y =0 to h-1 do
+	for x =0 to width-1 do
+		for y =0 to height-1 do
 			nested x y
 		done
 	done;
-	z:=0.;
+	(* z:=0.; *)
 	lastColor := firstColor;
-	for y =0 to h-1 do
-		for x =0 to w-1 do
+	for y =0 to height-1 do
+		for x =0 to width-1 do
 			nested x y
 		done
 	done;

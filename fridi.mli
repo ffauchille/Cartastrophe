@@ -1,6 +1,3 @@
-val rtri : float ref
-val zoom : float ref
-val resizeGLScene : width:int -> height:int -> unit
 module Vm :
   sig
     type key = int
@@ -18,17 +15,23 @@ module Vm :
     val compare : ('a -> 'a -> int) -> 'a t -> 'a t -> int
     val equal : ('a -> 'a -> bool) -> 'a t -> 'a t -> bool
   end
+val rtri : float ref
+val zoom : float ref
+val vmap : (Gl.rgb * Gl.point3) Vm.t ref
+val flist :
+  (ObjMaker.VertexMap.key * ObjMaker.VertexMap.key * ObjMaker.VertexMap.key)
+  list ref
+val resizeGLScene : width:int -> height:int -> unit
+val memoize : (unit -> 'a) -> unit -> unit
 val test :
   unit ->
   ((float * float * float) * (float * float * float)) Vm.t *
   (int * int * int) list
 val initGL : unit -> unit
-val drawMap :
-  < swap_buffers : unit -> 'a; .. > ->
-  (Gl.rgb * Gl.point3) ObjMaker.VertexMap.t ->
-  (ObjMaker.VertexMap.key * ObjMaker.VertexMap.key * ObjMaker.VertexMap.key)
-  list -> unit -> 'a
+val drawMap : unit -> unit
+val drawScene : < swap_buffers : unit -> 'a; .. > -> unit -> 'a
 val killGLWindow : unit -> unit
+val sw : 'a -> unit
 val display :
   < connect : < display : callback:(unit -> 'a) -> 'b;
                 realize : callback:(unit -> unit) -> 'c;
@@ -37,6 +40,6 @@ val display :
     swap_buffers : unit -> 'a; .. > ->
   int ->
   int ->
-  (Gl.rgb * Gl.point3) ObjMaker.VertexMap.t ->
+  (Gl.rgb * Gl.point3) Vm.t ->
   (ObjMaker.VertexMap.key * ObjMaker.VertexMap.key * ObjMaker.VertexMap.key)
   list -> 'c

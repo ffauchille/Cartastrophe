@@ -6,7 +6,7 @@ let filenameimage = ref ""
 (* Suppress warnings *)
 let sw foo = ()
 (*Ouverture de la fenetre*)
-(* On crée la surface d'affichage en doublebuffering *)
+(* On crée la surface d'affichage en doublebuffering *)
 (* let newDisplay () =(Sdlvideo.set_video_mode (!width) (!height) [`DOUBLEBUF]
 let display = ref (newDisplay ())
 let setSize w h = width:=w;height:=h;display :=newDisplay () *)
@@ -21,7 +21,7 @@ let setSize w h = width:=w;height:=h;display :=newDisplay () *)
 let load_picture = Sdlloader.load_image
 
 let setCaption = Sdlwm.set_caption
-(*string of stringoption*)
+
 (*Ouverture de la fenetre*)
 let window = GWindow.window
     ~title:"Cartastrophe"
@@ -84,8 +84,9 @@ let area =
     begin fun ev ->
       let key = GdkEvent.Key.keyval ev in
       if key = GdkKeysyms._Escape then window#destroy ()
-      else if key = GdkKeysyms._minus then Fridi.zoom:=!Fridi.zoom-.1.
-      else if key = GdkKeysyms._plus then Fridi.zoom:=!Fridi.zoom+.1.;
+      else if key = GdkKeysyms._minus then begin Fridi.zoom:=!Fridi.zoom-.10.;
+      print_float !Fridi.zoom end
+      else if key = GdkKeysyms._plus then Fridi.zoom:=!Fridi.zoom+.10.;
       true
     end);
     a
@@ -99,7 +100,7 @@ let image_processing filename =
     let (vmap,flist) = ObjMaker.calc_intersection (w,h) !interval
     in
     begin
-        (*ObjMaker.createObj (filename^".obj") (vmap,flist); *)
+        ObjMaker.createObj (filename^".obj") (vmap,flist);
         sw (Fridi.display area (2*(!height)/3) (2*(!width)/3) vmap flist);
        	(* Imprime les bordures sur l'image *)
         (* ImageProcessing.print_borders img breaks;*)
