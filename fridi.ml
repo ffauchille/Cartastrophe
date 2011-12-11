@@ -2,7 +2,17 @@ module Vm = ObjMaker.VertexMap
 let zoom = ref 70.0
 let map = ref None
 let w = ref 0. and h = ref 0.
+let initGL () =
+  GlDraw.shade_model `smooth;
+  GlClear.color ~alpha:1.0 (0.0, 0.0, 0.0);
+
+  GlClear.depth 1.0;
+  Gl.enable `depth_test;
+  GlFunc.depth_func `lequal;
+
+  GlMisc.hint `perspective_correction `nicest
 let resizeGLScene ~width ~height =
+    initGL ();
   let ok_height =
     if height = 0 then 1 else height in
 
@@ -19,15 +29,6 @@ let resizeGLScene ~width ~height =
   GlMat.load_identity ()
 
 
-let initGL () =
-  GlDraw.shade_model `smooth;
-  GlClear.color ~alpha:1.0 (1.0, 0.0, 1.0);
-
-  GlClear.depth 1.0;
-  Gl.enable `depth_test;
-  GlFunc.depth_func `lequal;
-
-  GlMisc.hint `perspective_correction `nicest
 
 let drawMap vmap flist () =
     let f i=
@@ -110,23 +111,23 @@ let display area width height vmap flist=
     Vm.iter display_keys _vmap;
     if Vm.is_empty _vmap then
         print_string "VMAP EST VIDE !!!";*)
-  initGL ();
   deleteMap (); 
   w:=float_of_int width;
   h:=float_of_int height;
   GMain.Timeout.remove !lastTo;
-  lastTo := (GMain.Timeout.add ~ms:20 ~callback:
-  begin fun () ->
-     drawScene area vmap flist ();
-     true
-  end;); 
   area#connect#display ~callback:(drawScene area vmap flist);
   area#connect#reshape ~callback:resizeGLScene;
   area#connect#realize ~callback:
     begin fun () ->
-      initGL ();
       resizeGLScene ~width ~height
-    end
+    end;
+
+  lastTo := (GMain.Timeout.add ~ms:20 ~callback:
+  begin fun () ->
+     drawScene area vmap flist ();
+     true
+  end;);
+  ()
 
 
 

@@ -67,4 +67,4 @@ val display :
   int ->
   (Gl.rgb * Gl.point3) ObjMaker.VertexMap.t ->
   (ObjMaker.VertexMap.key * ObjMaker.VertexMap.key * ObjMaker.VertexMap.key)
-  list -> 'c
+  list -> unit
