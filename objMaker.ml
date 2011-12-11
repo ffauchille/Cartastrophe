@@ -37,7 +37,7 @@ let calc_intersection (w,h) interval =
     
     let cx = w/interval 
 	    and cy = h/interval 
-        and vmap = VertexMap.empty
+        and vmap = ref VertexMap.empty
 	    and vlist = ref [] 
 	    and flist = ref []
 			and ul = ref 0 
@@ -52,14 +52,14 @@ let calc_intersection (w,h) interval =
 		
 		(* c=0 r=0 up left*)
 (*		vlist := (0.,0.,(getHeight (0.,0.) interval))::!vlist; (*hackfix*) *)
-        VertexMap.add 1 ((gC (0.,0.) interval),(0.,0.,(getHeight (0.,0.)
-        interval))) vmap; (*1*)
+        vmap:=VertexMap.add 1 ((gC (0.,0.) interval),(0.,0.,(getHeight (0.,0.)
+        interval))) !vmap; (*1*)
 		
 		(* pp i : i initialisé à 2 *)
 		for c = 0 to cy do
 			(* c=c r=0 : up right*) 
-			VertexMap.add !i ((gC (f_i c+.1.,0.) interval),(f_i c +.1.,0.0,(getHeight (f_i c+.1.,0.)
-            interval))) vmap;
+			vmap:=VertexMap.add !i ((gC (f_i c+.1.,0.) interval),(f_i c +.1.,0.0,(getHeight (f_i c+.1.,0.)
+            interval))) !vmap;
 			pp i;
 			for r = 0 to cx do
 					ur := !i-1;
@@ -78,9 +78,9 @@ let calc_intersection (w,h) interval =
 								else
 									ul := !i-3;
 								(* down left *)
-								VertexMap.add !i ((gC (f_i c,f_i r+.1.)
+								vmap:=VertexMap.add !i ((gC (f_i c,f_i r+.1.)
                                 interval),(f_i c,f_i r+.1.,
-								(getHeight (f_i c,f_i r+.1.) interval))) vmap;
+								(getHeight (f_i c,f_i r+.1.) interval))) !vmap;
 								dl := !i;
 								pp i;
 							end
@@ -91,13 +91,13 @@ let calc_intersection (w,h) interval =
 							end;
 					
 					(* middle center *)
-					VertexMap.add !i ((gC (f_i c+.0.5,f_i r+.0.5) interval),(f_i c+.0.5,f_i r+.0.5,
-					(getHeight (f_i c+.0.5,f_i r+.0.5) interval))) vmap;
+					vmap:=VertexMap.add !i ((gC (f_i c+.0.5,f_i r+.0.5) interval),(f_i c+.0.5,f_i r+.0.5,
+					(getHeight (f_i c+.0.5,f_i r+.0.5) interval))) !vmap;
 					mc := !i;
 					pp i;
 					(* down right *)
-					VertexMap.add !i ((gC (f_i c+.1.,f_i r+.1.) interval),(f_i c+.1.,f_i r+.1.
-					,(getHeight (f_i c+.1.,f_i r+.1.) interval))) vmap;
+					vmap:=VertexMap.add !i ((gC (f_i c+.1.,f_i r+.1.) interval),(f_i c+.1.,f_i r+.1.
+					,(getHeight (f_i c+.1.,f_i r+.1.) interval))) !vmap;
 					dr := !i;
 					pp i;
 					
@@ -113,7 +113,7 @@ let calc_intersection (w,h) interval =
 				done
 			done;
     
-    (vmap,!flist)
+    (!vmap,!flist)
 
 
 let pixel2coord (x,y,z) =

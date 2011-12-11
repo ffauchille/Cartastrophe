@@ -14,8 +14,32 @@ let resizeGLScene ~width ~height =
     
   GlMat.mode `modelview;
   GlMat.load_identity ()
+module Vm = ObjMaker.VertexMap 
+let test () = 
+    let vmap=ref Vm.empty and
+    flist=ref [] in
+    vmap:=Vm.add 1 ((1.,0.,0.),(0.,1.,0.)) !vmap;
+    vmap:=Vm.add 2 ((0.,1.,0.),(-1.,-1.,1.)) !vmap;
+    vmap:=Vm.add 3 ((0.,0.,1.),(1.,-1.,1.)) !vmap;
+    flist := (1,2,3)::!flist;
 
+    vmap:=Vm.add 4 ((1.,0.,0.),(0.,1.,0.)) !vmap;
+    vmap:=Vm.add 5 ((0.,0.,1.),(1.,-1.,1.)) !vmap;
+    vmap:=Vm.add 6 ((0.,1.,0.),(1.,-1.,-1.)) !vmap;
+    flist := (4,5,6)::!flist;
+    
+    vmap:=Vm.add 7 ((1.,0.,0.),(0.,1.,0.)) !vmap;
+    vmap:=Vm.add 8 ((0.,1.,0.),(1.,-1.,-1.)) !vmap;
+    vmap:=Vm.add 9 ((0.,0.,1.),(-1.,-1.,-1.)) !vmap;
+    flist := (7,9,9)::!flist;
 
+    vmap:=Vm.add 10 ((1.,0.,0.),(0.,1.,0.)) !vmap;
+    vmap:=Vm.add 11 ((0.,0.,1.),(-1.,-1.,-1.)) !vmap;
+    vmap:=Vm.add 12 ((0.,1.,0.),(-1.,-1.,1.)) !vmap;
+    flist := (10,11,12)::!flist;
+
+    (!vmap,!flist)
+    
 let initGL () =
   GlDraw.shade_model `smooth;
   
@@ -27,57 +51,13 @@ let initGL () =
 
   GlMisc.hint `perspective_correction `nicest
 (* module VertexMap = Map.Make(Int32) *)
-let _drawMap area foo bar () =
-  GlClear.clear [`color; `depth];
-  GlMat.load_identity ();
-  GlMat.translate ~x:(-1.5) ~y:0.0 ~z:(-6.0) ();
-  
-  GlMat.rotate ~angle:!rtri ~x:0.0 ~y:1.0 ~z:0.0 ();
-  
-  GlDraw.begins `triangles;
-
-  GlDraw.color (1.0, 0.0, 0.0);
-  GlDraw.vertex3 (0.0, 1.0, 0.0);
-  GlDraw.color (0.0, 1.0, 0.0);
-  GlDraw.vertex3 (-1.0, -1.0, 1.0);
-  GlDraw.color (0.0, 0.0, 1.0);
-  GlDraw.vertex3 (1.0, -1.0, 1.0);
-
-  GlDraw.color (1.0, 0.0, 0.0);
-  GlDraw.vertex3 (0.0, 1.0, 0.0);
-  GlDraw.color (0.0, 0.0, 1.0);
-  GlDraw.vertex3 (1.0, -1.0, 1.0);
-  GlDraw.color (0.0, 1.0, 0.0);
-  GlDraw.vertex3 (1.0, -1.0, -1.0);
-
-  GlDraw.color (1.0, 0.0, 0.0);
-  GlDraw.vertex3 (0.0, 1.0, 0.0);
-  GlDraw.color (0.0, 1.0, 0.0);
-  GlDraw.vertex3 (1.0, -1.0, -1.0);
-  GlDraw.color (0.0, 0.0, 1.0);
-  GlDraw.vertex3 (-1.0, -1.0, -1.0);
-
-  GlDraw.color (1.0, 0.0, 0.0);
-  GlDraw.vertex3 (0.0, 1.0, 0.0);
-  GlDraw.color (0.0, 0.0, 1.0);
-  GlDraw.vertex3 (-1.0, -1.0, -1.0);
-  GlDraw.color (0.0, 1.0, 0.0);
-  GlDraw.vertex3 (-1.0, -1.0, 1.0);
-
-  GlDraw.ends ();
-
-  rtri := !rtri +. 0.2;
-  area#swap_buffers ()
-  
-  
-
 
 let drawMap area vmap flist ()=
     let f i=
         let (c,vx) =
         try
             ObjMaker.VertexMap.find i vmap
-        with Not_found -> ((0.,0.,0.),(0.,0.,0.))
+        with Not_found -> ((0.,0.,0.),(0.,0.,0.)) 
         in
         GlDraw.color c;
         GlDraw.vertex3 vx; 
@@ -105,7 +85,12 @@ let killGLWindow () =
   () (* do nothing *)
 
 let display area width height vmap flist=
-  GMain.Timeout.add ~ms:200 ~callback:
+(*    let (vmap,flist) = test () in
+    let display_keys key value= print_int key in
+    Vm.iter display_keys vmap;
+    if Vm.is_empty vmap then
+        print_string "VMAP EST VIDE !!!";*)
+  GMain.Timeout.add ~ms:20 ~callback:
   begin fun () ->
      drawMap area vmap flist ();
      true

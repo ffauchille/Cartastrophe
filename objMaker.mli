@@ -29,7 +29,8 @@ module VertexMap :
 val calc_intersection :
   int * int ->
   int ->
-  'a VertexMap.t * (VertexMap.key * VertexMap.key * VertexMap.key) list
+  ((float * float * float) * (float * float * float)) VertexMap.t *
+  (VertexMap.key * VertexMap.key * VertexMap.key) list
 val pixel2coord : int * int * int -> float * float * float
 val createCoordList : (int * int * int) list -> (float * float * float) list
 val createObj :
