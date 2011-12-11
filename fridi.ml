@@ -15,7 +15,7 @@ let resizeGLScene ~width ~height =
   GlMat.mode `projection;
   GlMat.load_identity ();
   
-  GluMat.perspective ~fovy:!zoom ~aspect:((!w)/.(!h)) ~z:(0.1, 100.0);
+  GluMat.perspective ~fovy:!zoom ~aspect:((!w)/.(!h)) ~z:(0.001, 10000.0);
     
   GlMat.mode `modelview;
   GlMat.load_identity ()
@@ -54,7 +54,6 @@ let test () =
     
 let initGL () =
   GlDraw.shade_model `smooth;
-    print_string "PATATE"; 
   GlClear.color ~alpha:1.0 (1.0, 1.0, 0.0);
 
   GlClear.depth 1.0;
@@ -98,9 +97,17 @@ let rotateY s= c ry 1.5 s
 let rotateZ s= c rz 1.5 s
 let doZoom s = c zoom 5. s
 let autoplay ()= if !ap then rotateY 1
-
+let toggle_autoplay () = ap := not (!ap); ()
+let resetCamera ()=
+    rx:=0.; ry:=90.; rz:=180.; tx:=(-30.); ty:=0.; tz := (-70.);()
 let drawScene area ()=
   area#make_current ();
+  GlMat.mode `projection;
+  GlMat.load_identity ();
+
+  GluMat.perspective ~fovy:!zoom ~aspect:((!w)/.(!h)) ~z:(0.001, 10000.0);
+
+  GlMat.mode `modelview;
   GlClear.clear [`color; `depth];
   GlMat.load_identity ();
 
@@ -125,6 +132,7 @@ let display area width height _vmap _flist=
     Vm.iter display_keys _vmap;
     if Vm.is_empty _vmap then
         print_string "VMAP EST VIDE !!!";*)
+  initGL ();
   vmap:=_vmap;
   flist:=_flist;
   w:=float_of_int width;h:=float_of_int height;
@@ -133,7 +141,6 @@ let display area width height _vmap _flist=
      drawScene area ();
      true
   end;);
-
   area#connect#display ~callback:(drawScene area);
   area#connect#reshape ~callback:resizeGLScene;
   area#connect#realize ~callback:

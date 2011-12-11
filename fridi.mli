@@ -47,6 +47,8 @@ val rotateY : int -> unit
 val rotateZ : int -> unit
 val doZoom : int -> unit
 val autoplay : unit -> unit
+val toggle_autoplay : unit -> unit
+val resetCamera : unit -> unit
 val drawScene :
   < make_current : unit -> 'a; swap_buffers : unit -> 'b; .. > -> unit -> 'b
 val killGLWindow : unit -> unit

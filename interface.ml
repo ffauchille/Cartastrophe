@@ -98,19 +98,22 @@ let area =
       | GdkKeysyms._E   -> Fridi.translateY () *)
       let key = (GdkEvent.Key.keyval ev) in
       if key =  GdkKeysyms._Escape then window#destroy ()
-      else if key =  GdkKeysyms._minus  then Fridi.doZoom (-1)
-      else if key =  GdkKeysyms._plus   then Fridi.doZoom (1)
+      else if key =  GdkKeysyms._minus  then Fridi.doZoom (1)
+      else if key =  GdkKeysyms._plus   then Fridi.doZoom (-1)
       else if key =  GdkKeysyms._Up      then Fridi.rotateZ (1)
       else if key =  GdkKeysyms._Down    then Fridi.rotateZ (-1)
       else if key =  GdkKeysyms._Left    then Fridi.rotateY (1)
       else if key =  GdkKeysyms._Right   then Fridi.rotateY (-1)
+      else if key =  GdkKeysyms._Page_Up then Fridi.rotateX (1)
+      else if key =  GdkKeysyms._Page_Down then Fridi.rotateX (-1)
       else if key =  GdkKeysyms._z   then Fridi.translateZ (1)
       else if key =  GdkKeysyms._s   then Fridi.translateZ (-1)
       else if key =  GdkKeysyms._q   then Fridi.translateX (1)
       else if key =  GdkKeysyms._d   then Fridi.translateX (-1)
       else if key =  GdkKeysyms._a   then Fridi.translateY (1)
-      else if key =  GdkKeysyms._e   then Fridi.translateY (-1);
-
+      else if key =  GdkKeysyms._e   then Fridi.translateY (-1)
+      else if key =  GdkKeysyms._o   then Fridi.resetCamera ()
+      else if key =  GdkKeysyms._space then Fridi.toggle_autoplay ();
       true end
     end);
     a
