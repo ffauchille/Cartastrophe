@@ -27,7 +27,7 @@ let initGL () =
 
   GlMisc.hint `perspective_correction `nicest
 (* module VertexMap = Map.Make(Int32) *)
-let drawMap area foo bar () =
+let _drawMap area foo bar () =
   GlClear.clear [`color; `depth];
   GlMat.load_identity ();
   GlMat.translate ~x:(-1.5) ~y:0.0 ~z:(-6.0) ();
@@ -72,7 +72,7 @@ let drawMap area foo bar () =
   
 
 
-let _drawMap area vmap flist ()=
+let drawMap area vmap flist ()=
     let f i=
         let (c,vx) =
         try
@@ -80,7 +80,7 @@ let _drawMap area vmap flist ()=
         with Not_found -> ((0.,0.,0.),(0.,0.,0.))
         in
         GlDraw.color c;
-        GlDraw.vertex3 vx; ()
+        GlDraw.vertex3 vx; 
     in
     let g (i,j,k) = (f i);(f j);(f k) in
   GlClear.clear [`color; `depth];
@@ -105,7 +105,7 @@ let killGLWindow () =
   () (* do nothing *)
 
 let display area width height vmap flist=
-  GMain.Timeout.add ~ms:20 ~callback:
+  GMain.Timeout.add ~ms:200 ~callback:
   begin fun () ->
      drawMap area vmap flist ();
      true
