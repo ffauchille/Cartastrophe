@@ -1,8 +1,6 @@
 val f_i : int -> float
 val s_i : int -> string
 val s_f : float -> string
-val lastHeight : float ref
-val lastColor : (float * float * float) ref
 val pgcd : int -> int -> int
 val getHeight : float * float * float -> float
 val getColor : float * float -> int -> float * float * float

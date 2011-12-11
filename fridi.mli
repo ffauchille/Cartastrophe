@@ -15,22 +15,21 @@ module Vm :
     val compare : ('a -> 'a -> int) -> 'a t -> 'a t -> int
     val equal : ('a -> 'a -> bool) -> 'a t -> 'a t -> bool
   end
-val rtri : float ref
 val zoom : float ref
-val vmap : (Gl.rgb * Gl.point3) Vm.t ref
-val flist :
-  (ObjMaker.VertexMap.key * ObjMaker.VertexMap.key * ObjMaker.VertexMap.key)
-  list ref
+val map : GlList.t option ref
 val w : float ref
 val h : float ref
 val resizeGLScene : width:int -> height:int -> unit
-val memoize : (unit -> 'a) -> unit -> unit
-val test :
-  unit ->
-  ((float * float * float) * (float * float * float)) Vm.t *
-  (int * int * int) list
 val initGL : unit -> unit
-val drawMap : unit -> unit
+val drawMap :
+  (Gl.rgb * Gl.point3) ObjMaker.VertexMap.t ->
+  (ObjMaker.VertexMap.key * ObjMaker.VertexMap.key * ObjMaker.VertexMap.key)
+  list -> unit -> unit
+val deleteMap : unit -> unit
+val callCompileMap :
+  (Gl.rgb * Gl.point3) ObjMaker.VertexMap.t ->
+  (ObjMaker.VertexMap.key * ObjMaker.VertexMap.key * ObjMaker.VertexMap.key)
+  list -> unit
 val rx : float ref
 val ry : float ref
 val rz : float ref
@@ -38,6 +37,7 @@ val tx : float ref
 val ty : float ref
 val tz : float ref
 val ap : bool ref
+val wf : bool ref
 val c : float ref -> float -> int -> unit
 val translateX : int -> unit
 val translateY : int -> unit
@@ -50,9 +50,13 @@ val autoplay : unit -> unit
 val toggle_autoplay : unit -> unit
 val resetCamera : unit -> unit
 val drawScene :
-  < make_current : unit -> 'a; swap_buffers : unit -> 'b; .. > -> unit -> 'b
+  < make_current : unit -> 'a; swap_buffers : unit -> 'b; .. > ->
+  (Gl.rgb * Gl.point3) ObjMaker.VertexMap.t ->
+  (ObjMaker.VertexMap.key * ObjMaker.VertexMap.key * ObjMaker.VertexMap.key)
+  list -> unit -> 'b
 val killGLWindow : unit -> unit
 val sw : 'a -> unit
+val lastTo : GMain.Timeout.id ref
 val display :
   < connect : < display : callback:(unit -> 'a) -> 'b;
                 realize : callback:(unit -> unit) -> 'c;
@@ -61,6 +65,6 @@ val display :
     make_current : unit -> 'e; swap_buffers : unit -> 'a; .. > ->
   int ->
   int ->
-  (Gl.rgb * Gl.point3) Vm.t ->
+  (Gl.rgb * Gl.point3) ObjMaker.VertexMap.t ->
   (ObjMaker.VertexMap.key * ObjMaker.VertexMap.key * ObjMaker.VertexMap.key)
   list -> 'c

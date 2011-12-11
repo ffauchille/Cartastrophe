@@ -1,31 +1,31 @@
 let f_i = float_of_int
 let s_i = string_of_int
 let s_f = string_of_float
-let lastHeight = ref 0.
-let lastColor = ref (0.,0.,0.)
+(*let lastHeight = ref 0.
+let lastColor = ref (0.,0.,0.)*)
 let rec pgcd n m =
   if n > m then pgcd m n
   else if n = 0 then m
        else let r = m mod n in
             pgcd r n
 let getHeight (r1,g1,b1) =(* Printf.printf "%f,%f %u\n" x y interval; *)
-try
+(* try *)
 
     let (r,g,b)=
         (int_of_float (255.*.r1),
          int_of_float (255.*.g1),
          int_of_float (255.*.b1)) in
-    lastHeight :=float_of_int (ImageProcessing.getHeightFor (r,g,b));
+    (*lastHeight :=*)float_of_int (ImageProcessing.getHeightFor (r,g,b))(*;
 	!lastHeight
-with Not_found -> !lastHeight
+ with Not_found -> !lastHeight *)
 
 let getColor (x,y) interval =(* Printf.printf "%f,%f %u\n" x y interval; *)
-try 
+(* try *)
     let (r,g,b)=ImageProcessing.getColorAt
 	(int_of_float ((f_i interval) *.x),int_of_float ((f_i interval) *.y )) in 
-    lastColor := (((f_i r)/.255.),((f_i g)/.255.),((f_i b)/.255.));
+    (*lastColor :=*) (((f_i r)/.255.),((f_i g)/.255.),((f_i b)/.255.))(* ;
 	!lastColor
-with Not_found -> !lastColor
+with Not_found -> !lastColor *)
 let gH=getHeight
 let gC=getColor
 (* let gH (x,y) interval = (x-.y)*.(x+.y) *) 

@@ -89,9 +89,9 @@ let colorIndex c1 list =
 	in
 		nested 0 list
 let getColorAt (x,y) = 
-    (* if x>=w || y>=h then
-        begin print_string "color nf";raise Not_found end
-    else*) (Sdlvideo.get_pixel_color !image x y)
+    if x>(!w) || y>(!h) then
+      Sdlvideo.get_pixel_color !image !w !h
+    else (Sdlvideo.get_pixel_color !image x y)
 let getHeightFor color =
     (* let rec count i c = (function
         | [] -> print_string "height nf";raise Not_found
