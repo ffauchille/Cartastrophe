@@ -21,6 +21,8 @@ val vmap : (Gl.rgb * Gl.point3) Vm.t ref
 val flist :
   (ObjMaker.VertexMap.key * ObjMaker.VertexMap.key * ObjMaker.VertexMap.key)
   list ref
+val w : float ref
+val h : float ref
 val resizeGLScene : width:int -> height:int -> unit
 val memoize : (unit -> 'a) -> unit -> unit
 val test :
@@ -35,6 +37,7 @@ val rz : float ref
 val tx : float ref
 val ty : float ref
 val tz : float ref
+val ap : bool ref
 val c : float ref -> float -> int -> unit
 val translateX : int -> unit
 val translateY : int -> unit
@@ -43,7 +46,9 @@ val rotateX : int -> unit
 val rotateY : int -> unit
 val rotateZ : int -> unit
 val doZoom : int -> unit
-val drawScene : < swap_buffers : unit -> 'a; .. > -> unit -> 'a
+val autoplay : unit -> unit
+val drawScene :
+  < make_current : unit -> 'a; swap_buffers : unit -> 'b; .. > -> unit -> 'b
 val killGLWindow : unit -> unit
 val sw : 'a -> unit
 val display :
@@ -51,7 +56,7 @@ val display :
                 realize : callback:(unit -> unit) -> 'c;
                 reshape : callback:(width:int -> height:int -> unit) -> 'd;
                 .. >;
-    swap_buffers : unit -> 'a; .. > ->
+    make_current : unit -> 'e; swap_buffers : unit -> 'a; .. > ->
   int ->
   int ->
   (Gl.rgb * Gl.point3) Vm.t ->

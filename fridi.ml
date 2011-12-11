@@ -3,16 +3,19 @@ let rtri = ref 0.0
 let zoom = ref 70.0
 let vmap   = ref Vm.empty
 let flist  = ref []
+let w = ref 0. and h = ref 0.
 let resizeGLScene ~width ~height =
   let ok_height =
     if height = 0 then 1 else height in
 
+  w:=float_of_int width;
+  h:=float_of_int ok_height;
   GlDraw.viewport 0 0 width ok_height;
 
   GlMat.mode `projection;
   GlMat.load_identity ();
   
-  GluMat.perspective ~fovy:!zoom ~aspect:((float_of_int width)/.(float_of_int ok_height)) ~z:(0.1, 100.0);
+  GluMat.perspective ~fovy:!zoom ~aspect:((!w)/.(!h)) ~z:(0.1, 100.0);
     
   GlMat.mode `modelview;
   GlMat.load_identity ()
@@ -51,8 +54,8 @@ let test () =
     
 let initGL () =
   GlDraw.shade_model `smooth;
-  
-  GlClear.color ~alpha:0.0 (0.0, 0.0, 0.0);
+    print_string "PATATE"; 
+  GlClear.color ~alpha:1.0 (1.0, 1.0, 0.0);
 
   GlClear.depth 1.0;
   Gl.enable `depth_test;
@@ -77,26 +80,27 @@ let drawMap () =
 
   GlDraw.ends (); ()
 let drawMap = memoize drawMap
-
-let rx=ref 0. and ry = ref 90. and rz = ref 0.
-let tx=ref 0. and ty = ref 0. and tz = ref 0.
-
+let rx=ref 0. and ry = ref 90. and rz = ref 180.
+let tx=ref (-30.) and ty = ref (0.) and tz = ref (-70.)
+let ap=ref true
 let c r p s= 
     if s = 1 then
         r:=!r+.p
     else
-        r:=!r-.p
-let translateX s= c tx 1. s;()
-let translateY s= c ty 1. s;()
-let translateZ s= c tz 1. s;()
+        r:=!r-.p;
+     ()
+let translateX s= c tx 1. s
+let translateY s= c ty 1. s
+let translateZ s= c tz 1. s
 
-let rotateX s= c rx 1.5 s;()
-let rotateY s= c ry 1.5 s;()
-let rotateZ s= c rz 1.5 s;()
-
-let doZoom s = c zoom 5. s;()
+let rotateX s= c rx 1.5 s
+let rotateY s= c ry 1.5 s
+let rotateZ s= c rz 1.5 s
+let doZoom s = c zoom 5. s
+let autoplay ()= if !ap then rotateY 1
 
 let drawScene area ()=
+  area#make_current ();
   GlClear.clear [`color; `depth];
   GlMat.load_identity ();
 
@@ -106,11 +110,10 @@ let drawScene area ()=
   GlMat.rotate ~angle:!ry ~x:0.0 ~y:1.0 ~z:0.0 ();
   GlMat.rotate ~angle:!rz ~x:0.0 ~y:0.0 ~z:1.0 ();
   
-  (* GluMat.perspective ~fovy:!zoom ~aspect:((float_of_int width)/.(float_of_int
-   * ok_height)) ~z:(0.1, 100.0);*)
+(*  GluMat.perspective ~fovy:!zoom ~aspect:((!w)/.(!h)) ~z:(0.1, 100.0);*)
     
   drawMap ();
-  (*rtri := !rtri +. 0.2;*)
+  autoplay ();
   area#swap_buffers ()
 
 let killGLWindow () =
@@ -122,9 +125,10 @@ let display area width height _vmap _flist=
     Vm.iter display_keys _vmap;
     if Vm.is_empty _vmap then
         print_string "VMAP EST VIDE !!!";*)
-    vmap:=_vmap;
-    flist:=_flist;
-  sw (GMain.Timeout.add ~ms:170 ~callback:
+  vmap:=_vmap;
+  flist:=_flist;
+  w:=float_of_int width;h:=float_of_int height;
+  sw (GMain.Timeout.add ~ms:20 ~callback:
   begin fun () ->
      drawScene area ();
      true
