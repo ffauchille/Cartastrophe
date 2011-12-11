@@ -29,6 +29,20 @@ val test :
   (int * int * int) list
 val initGL : unit -> unit
 val drawMap : unit -> unit
+val rx : float ref
+val ry : float ref
+val rz : float ref
+val tx : float ref
+val ty : float ref
+val tz : float ref
+val c : float ref -> float -> int -> unit
+val translateX : int -> unit
+val translateY : int -> unit
+val translateZ : int -> unit
+val rotateX : int -> unit
+val rotateY : int -> unit
+val rotateZ : int -> unit
+val doZoom : int -> unit
 val drawScene : < swap_buffers : unit -> 'a; .. > -> unit -> 'a
 val killGLWindow : unit -> unit
 val sw : 'a -> unit

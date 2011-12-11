@@ -12,8 +12,7 @@ let resizeGLScene ~width ~height =
   GlMat.mode `projection;
   GlMat.load_identity ();
   
-  GluMat.perspective ~fovy:!zoom
-    ~aspect:((float_of_int width)/.(float_of_int ok_height)) ~z:(0.1, 100.0);
+  GluMat.perspective ~fovy:!zoom ~aspect:((float_of_int width)/.(float_of_int ok_height)) ~z:(0.1, 100.0);
     
   GlMat.mode `modelview;
   GlMat.load_identity ()
@@ -79,18 +78,40 @@ let drawMap () =
   GlDraw.ends (); ()
 let drawMap = memoize drawMap
 
+let rx=ref 0. and ry = ref 90. and rz = ref 0.
+let tx=ref 0. and ty = ref 0. and tz = ref 0.
+
+let c r p s= 
+    if s = 1 then
+        r:=!r+.p
+    else
+        r:=!r-.p
+let translateX s= c tx 1. s;()
+let translateY s= c ty 1. s;()
+let translateZ s= c tz 1. s;()
+
+let rotateX s= c rx 1.5 s;()
+let rotateY s= c ry 1.5 s;()
+let rotateZ s= c rz 1.5 s;()
+
+let doZoom s = c zoom 5. s;()
+
 let drawScene area ()=
   GlClear.clear [`color; `depth];
   GlMat.load_identity ();
-  GlMat.translate ~x:(-1.5) ~y:0.0 ~z:(-6.0) ();
-  GlMat.rotate ~angle:!rtri ~x:0.0 ~y:1.0 ~z:0.0 ();
+
+  GlMat.translate ~x:!tx ~y:!ty ~z:!tz ();
+
+  GlMat.rotate ~angle:!rx ~x:1.0 ~y:0.0 ~z:0.0 ();
+  GlMat.rotate ~angle:!ry ~x:0.0 ~y:1.0 ~z:0.0 ();
+  GlMat.rotate ~angle:!rz ~x:0.0 ~y:0.0 ~z:1.0 ();
   
+  (* GluMat.perspective ~fovy:!zoom ~aspect:((float_of_int width)/.(float_of_int
+   * ok_height)) ~z:(0.1, 100.0);*)
+    
   drawMap ();
-  rtri := !rtri +. 0.2;
-
+  (*rtri := !rtri +. 0.2;*)
   area#swap_buffers ()
-  
-
 
 let killGLWindow () =
   () (* do nothing *)
@@ -103,7 +124,7 @@ let display area width height _vmap _flist=
         print_string "VMAP EST VIDE !!!";*)
     vmap:=_vmap;
     flist:=_flist;
-  sw (GMain.Timeout.add ~ms:100 ~callback:
+  sw (GMain.Timeout.add ~ms:170 ~callback:
   begin fun () ->
      drawScene area ();
      true

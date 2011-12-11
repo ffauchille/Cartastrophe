@@ -81,13 +81,37 @@ let area =
     end);
     sw (
     window#event#connect#key_press ~callback:
-    begin fun ev ->
-      let key = GdkEvent.Key.keyval ev in
-      if key = GdkKeysyms._Escape then window#destroy ()
-      else if key = GdkKeysyms._minus then begin Fridi.zoom:=!Fridi.zoom-.10.;
-      print_float !Fridi.zoom end
-      else if key = GdkKeysyms._plus then Fridi.zoom:=!Fridi.zoom+.10.;
-      true
+    begin fun ev -> begin 
+(*      match (GdkEvent.Key.keyval ev) with
+      | GdkKeysyms._Escape -> window#destroy ()
+      | GdkKeysyms._minus  -> Fridi.doUnzoom ()
+      | GdkKeysyms._plus   -> Fridi.doZoom ()
+      | GdkKeysyms._Up      -> Fridi.rotateZ ()
+      | GdkKeysyms._Down    -> Fridi.rotateZ ()
+      | GdkKeysyms._Left    -> Fridi.rotateY ()
+      | GdkKeysyms._Right   -> Fridi.rotateY ()      
+      | GdkKeysyms._Z   -> Fridi.translateX ()
+      | GdkKeysyms._S   -> Fridi.translateX ()
+      | GdkKeysyms._Q   -> Fridi.translateZ ()
+      | GdkKeysyms._D   -> Fridi.translateZ ()
+      | GdkKeysyms._A   -> Fridi.translateY ()
+      | GdkKeysyms._E   -> Fridi.translateY () *)
+      let key = (GdkEvent.Key.keyval ev) in
+      if key =  GdkKeysyms._Escape then window#destroy ()
+      else if key =  GdkKeysyms._minus  then Fridi.doZoom (-1)
+      else if key =  GdkKeysyms._plus   then Fridi.doZoom (1)
+      else if key =  GdkKeysyms._Up      then Fridi.rotateZ (1)
+      else if key =  GdkKeysyms._Down    then Fridi.rotateZ (-1)
+      else if key =  GdkKeysyms._Left    then Fridi.rotateY (1)
+      else if key =  GdkKeysyms._Right   then Fridi.rotateY (-1)
+      else if key =  GdkKeysyms._z   then Fridi.translateZ (1)
+      else if key =  GdkKeysyms._s   then Fridi.translateZ (-1)
+      else if key =  GdkKeysyms._q   then Fridi.translateX (1)
+      else if key =  GdkKeysyms._d   then Fridi.translateX (-1)
+      else if key =  GdkKeysyms._a   then Fridi.translateY (1)
+      else if key =  GdkKeysyms._e   then Fridi.translateY (-1);
+
+      true end
     end);
     a
 let image_processing filename = 
@@ -100,7 +124,7 @@ let image_processing filename =
     let (vmap,flist) = ObjMaker.calc_intersection (w,h) !interval
     in
     begin
-        ObjMaker.createObj (filename^".obj") (vmap,flist);
+        (*ObjMaker.createObj (filename^".obj") (vmap,flist);*)
         sw (Fridi.display area (2*(!height)/3) (2*(!width)/3) vmap flist);
        	(* Imprime les bordures sur l'image *)
         (* ImageProcessing.print_borders img breaks;*)
