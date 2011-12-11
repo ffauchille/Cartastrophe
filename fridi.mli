@@ -1,4 +1,5 @@
 val rtri : float ref
+val zoom : float ref
 val resizeGLScene : width:int -> height:int -> unit
 module Vm :
   sig

@@ -34,4 +34,5 @@ val calc_intersection :
 val pixel2coord : int * int * int -> float * float * float
 val createCoordList : (int * int * int) list -> (float * float * float) list
 val createObj :
-  string -> (float * float * float) list * (int * int * int) list -> unit
+  string ->
+  ('a * (float * float * float)) VertexMap.t * (int * int * int) list -> unit

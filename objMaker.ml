@@ -38,7 +38,6 @@ let calc_intersection (w,h) interval =
     let cx = w/interval 
 	    and cy = h/interval 
         and vmap = ref VertexMap.empty
-	    and vlist = ref [] 
 	    and flist = ref []
 			and ul = ref 0 
 			and ur = ref 0 
@@ -52,14 +51,14 @@ let calc_intersection (w,h) interval =
 		
 		(* c=0 r=0 up left*)
 (*		vlist := (0.,0.,(getHeight (0.,0.) interval))::!vlist; (*hackfix*) *)
-        vmap:=VertexMap.add 1 ((gC (0.,0.) interval),(0.,0.,(getHeight (0.,0.)
-        interval))) !vmap; (*1*)
+        vmap:=VertexMap.add 1 ((gC (0.,0.) interval),(0.,(getHeight (0.,0.)
+        interval),0.)) !vmap; (*1*)
 		
 		(* pp i : i initialisé à 2 *)
 		for c = 0 to cy do
 			(* c=c r=0 : up right*) 
-			vmap:=VertexMap.add !i ((gC (f_i c+.1.,0.) interval),(f_i c +.1.,0.0,(getHeight (f_i c+.1.,0.)
-            interval))) !vmap;
+			vmap:=VertexMap.add !i ((gC (f_i c+.1.,0.) interval),(f_i c +.1.,(getHeight (f_i c+.1.,0.)
+            interval),0.0)) !vmap;
 			pp i;
 			for r = 0 to cx do
 					ur := !i-1;
@@ -79,8 +78,9 @@ let calc_intersection (w,h) interval =
 									ul := !i-3;
 								(* down left *)
 								vmap:=VertexMap.add !i ((gC (f_i c,f_i r+.1.)
-                                interval),(f_i c,f_i r+.1.,
-								(getHeight (f_i c,f_i r+.1.) interval))) !vmap;
+                                interval),(f_i c,
+								(getHeight (f_i c,f_i r+.1.) interval),f_i
+                                r+.1.)) !vmap;
 								dl := !i;
 								pp i;
 							end
@@ -91,13 +91,15 @@ let calc_intersection (w,h) interval =
 							end;
 					
 					(* middle center *)
-					vmap:=VertexMap.add !i ((gC (f_i c+.0.5,f_i r+.0.5) interval),(f_i c+.0.5,f_i r+.0.5,
-					(getHeight (f_i c+.0.5,f_i r+.0.5) interval))) !vmap;
+					vmap:=VertexMap.add !i ((gC (f_i c+.0.5,f_i r+.0.5)
+                    interval),(f_i c+.0.5,
+					(getHeight (f_i c+.0.5,f_i r+.0.5) interval),f_i r+.0.5)) !vmap;
 					mc := !i;
 					pp i;
 					(* down right *)
-					vmap:=VertexMap.add !i ((gC (f_i c+.1.,f_i r+.1.) interval),(f_i c+.1.,f_i r+.1.
-					,(getHeight (f_i c+.1.,f_i r+.1.) interval))) !vmap;
+					vmap:=VertexMap.add !i ((gC (f_i c+.1.,f_i r+.1.)
+                    interval),(f_i c+.1.
+					,(getHeight (f_i c+.1.,f_i r+.1.) interval),f_i r+.1.)) !vmap;
 					dr := !i;
 					pp i;
 					
@@ -123,17 +125,15 @@ let pixel2coord (x,y,z) =
 let rec createCoordList = function
 	| [] -> []
 	| c::l ->  (pixel2coord c)::(createCoordList l) 
-let createObj filename (vList,fList)  =
+let createObj filename (vMap,fList)  =
 		let file = 
 			open_out_gen [Open_wronly; Open_creat; Open_trunc] 511 filename in
-		let rec concatVertices = 
-				function
-				| [] -> "\n"
-				| (x,y,z):: l -> concatVertices l ^
+        let vertices = ref "" in
+		let concatVertices i (color,(x,y,z))=
+                vertices :=
 				"\nv "^(string_of_float x)^
 				" "^(string_of_float z)^
-				" "^(string_of_float y)
-				
+				" "^(string_of_float y)^(!vertices)
 		in
 		let rec concatFacets = 
 				function
@@ -145,9 +145,9 @@ let createObj filename (vList,fList)  =
 				" "^(string_of_int c)
 				
 		in
-		
+        VertexMap.iter concatVertices vMap;	
 		output_string file ("# Debut du fichier"^
-												(concatVertices vList)^
-												(concatFacets fList)^
+							!vertices ^					
+                            (concatFacets fList)^
 												"\n# Fin du fichier "^filename);
 		close_out file

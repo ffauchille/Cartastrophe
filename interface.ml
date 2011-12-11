@@ -3,6 +3,8 @@ let height= ref 600
 let backgroundimage= ref "madamecatastrophe.jpeg"
 let interval = ref 10
 let filenameimage = ref ""
+(* Suppress warnings *)
+let sw foo = ()
 (*Ouverture de la fenetre*)
 (* On crée la surface d'affichage en doublebuffering *)
 (* let newDisplay () =(Sdlvideo.set_video_mode (!width) (!height) [`DOUBLEBUF]
@@ -60,6 +62,65 @@ let s_of_s_o = function
 let image_filter =GFile.filter
     ~name:"Fichier image"
     ~patterns:["*.bmp";"*.png";"*.jpg";"*.jpeg"] ()
+(*affichage de l'image d'un GMisc.image*)
+let image = GMisc.image
+    ~file:!filenameimage
+    ~packing:frame_image_treated#add ()
+let area = 
+    let a = GlGtk.area [`DOUBLEBUFFER;`RGBA;`DEPTH_SIZE 16;`BUFFER_SIZE 16]
+    ~height:(2*(!height)/3) 
+    ~width:(2*(!width)/3)
+    ~packing:frame_visualisation#add ()
+     in
+    a#event#add [`KEY_PRESS];
+    sw (window#event#connect#scroll ~callback:
+    begin fun ev ->
+       Fridi.zoom:=GdkEvent.Scroll.y ev;
+       print_float !Fridi.zoom;
+       true 
+    end);
+    sw (
+    window#event#connect#key_press ~callback:
+    begin fun ev ->
+      let key = GdkEvent.Key.keyval ev in
+      if key = GdkKeysyms._Escape then window#destroy ()
+      else if key = GdkKeysyms._minus then Fridi.zoom:=!Fridi.zoom-.1.
+      else if key = GdkKeysyms._plus then Fridi.zoom:=!Fridi.zoom+.1.;
+      true
+    end);
+    a
+let image_processing filename = 
+    let img = load_picture filename in
+    (* On récupère les dimensions *)
+    let (w, h) = ImageProcessing.get_dims img in
+    (* Traite l'image *)
+    (*let breaks =*)
+    sw (ImageProcessing.detect_areas img);
+    let (vmap,flist) = ObjMaker.calc_intersection (w,h) !interval
+    in
+    begin
+        (*ObjMaker.createObj (filename^".obj") (vmap,flist); *)
+        sw (Fridi.display area (2*(!height)/3) (2*(!width)/3) vmap flist);
+       	(* Imprime les bordures sur l'image *)
+        (* ImageProcessing.print_borders img breaks;*)
+        (* Affiche l'image modifiée *)
+        filenameimage := filename;
+        image#set_file filename;
+    end
+
+let may_print btn () = Gaux.may image_processing btn#filename
+
+let map_button = 
+let button = GFile.chooser_button
+    ~title:"Choix de la carte"
+    ~action:`OPEN
+    (*~set_filter:image_filter*)
+    ~packing:bbox#add () in
+    sw (button#connect#selection_changed (may_print button));
+(*GMisc.image ~file:!filenameimage ~packing:frame_image_treated#add();*)
+    button
+
+
 (*let help_message _=
   let dlg _= GWindow.message_dialog
     ~message:"1. Cliquez sur le premier bouton, celui permettant de selection 
@@ -96,16 +157,16 @@ let about_button =
   let btn = GButton.button 
     ~stock:`ABOUT 
     ~packing:bbox#add () in
-  GMisc.image ~stock:`ABOUT ~packing:btn#set_image ();
-  btn#connect#clicked (fun () -> ignore (dlg#run ()); dlg#misc#hide ());
+  sw (GMisc.image ~stock:`ABOUT ~packing:btn#set_image ());
+  sw (btn#connect#clicked (fun () -> ignore (dlg#run ()); dlg#misc#hide ()));
   btn
 (*Bouton quitter*)
 let quit =
     let button = GButton.button
 	~stock:`QUIT
 	~packing:bbox#add () in
-    GMisc.image ~stock:`QUIT ~packing:button#set_image ();
-    (button#connect#clicked ~callback:GMain.quit);
+    sw (GMisc.image ~stock:`QUIT ~packing:button#set_image ());
+    sw ((button#connect#clicked ~callback:GMain.quit));
     button
 (*Creation d'une box pour l'image*)
 (*let imgbox = GPack.box `VERTICAL
@@ -113,61 +174,6 @@ let quit =
     ~border_width: 5
     ~packing: window#add () *)
     
-(*affichage de l'image d'un GMisc.image*)
-let image = GMisc.image
-    ~file:!filenameimage
-    ~packing:frame_image_treated#add ()
-let area = 
-    let a = GlGtk.area [`DOUBLEBUFFER;`RGBA;`DEPTH_SIZE 16;`BUFFER_SIZE 16]
-    ~height:(2*(!height)/3) 
-    ~width:(2*(!width)/3)
-    ~packing:frame_visualisation#add ()
-     in
-    a#event#add [`KEY_PRESS];
-    window#event#connect#key_press ~callback:
-    begin fun ev ->
-      let key = GdkEvent.Key.keyval ev in
-      if key = GdkKeysyms._Escape then window#destroy ();
-      true
-    end;
-    a
-let image_processing filename = 
-    let img = load_picture filename in
-    (* On récupère les dimensions *)
-    let (w, h) = ImageProcessing.get_dims img in
-    (* Traite l'image *)
-    let breaks = (ImageProcessing.detect_areas img) in
-    (* ObjMaker.createObj (filename^".obj") (ObjMaker.calc_intersection (w,h)
-    !interval); *)
-    let (vmap,flist) = ObjMaker.calc_intersection (w,h) !interval
-    in
-    begin
-    (Fridi.display area (2*(!height)/3) (2*(!width)/3) vmap flist); 
-   	(* Imprime les bordures sur l'image *)
-    ImageProcessing.print_borders img breaks;
-    (* Affiche l'image modifiée *)
-    (* Sdlvideo.save_BMP img (filename^"-traite.bmp");*)
-    (* Sdlvideo.save_BMP (ImageProcessing.crisscross img (w,h) (!interval))
-    (filename^"-crisscross.bmp"); *)
-    filenameimage := filename;
-    image#set_file filename;
-    end
-
-let may_print btn () = Gaux.may image_processing btn#filename
-
-let map_button = 
-let button = GFile.chooser_button
-    ~title:"Choix de la carte"
-    ~action:`OPEN
-    (*~set_filter:image_filter*)
-    ~packing:bbox#add () in
-    (button#connect#selection_changed (may_print button));
-(*GMisc.image ~file:!filenameimage ~packing:frame_image_treated#add();*)
-    button
-
-
-(* Suppress warnings *)
-let sw foo = ()
 (*(*image de fond*)
 let background_image = GMisc.image
     ~file:!backgroundimage
@@ -178,7 +184,7 @@ let init () =
 		Sdl.init [`EVERYTHING];
 		(*Sdlevent.enable_events Sdlevent.all_events_mask;*)
 		(*GMain.init ();*)
-		(*sw*) (window#connect#destroy ~callback:GMain.quit);
+		sw (window#connect#destroy ~callback:GMain.quit);
 		window#show ();
 		GMain.Main.main ()
 	end
