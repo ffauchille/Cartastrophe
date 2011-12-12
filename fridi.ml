@@ -9,7 +9,6 @@ let initGL () =
   GlClear.depth 1.0;
   Gl.enable `depth_test;
   GlFunc.depth_func `lequal;
-  Gl.enable `polygon_offset_line;
   GlMisc.hint `perspective_correction `nicest
 let resizeGLScene ~width ~height =
     initGL ();
