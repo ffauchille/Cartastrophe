@@ -19,8 +19,8 @@ val zoom : float ref
 val map : GlList.t option ref
 val w : float ref
 val h : float ref
-val resizeGLScene : width:int -> height:int -> unit
 val initGL : unit -> unit
+val resizeGLScene : width:int -> height:int -> unit
 val drawMap :
   (Gl.rgb * Gl.point3) ObjMaker.VertexMap.t ->
   (ObjMaker.VertexMap.key * ObjMaker.VertexMap.key * ObjMaker.VertexMap.key)
@@ -49,6 +49,7 @@ val doZoom : int -> unit
 val autoplay : unit -> unit
 val toggle_autoplay : unit -> unit
 val resetCamera : unit -> unit
+val toggleWireframe : unit -> unit
 val drawScene :
   < make_current : unit -> 'a; swap_buffers : unit -> 'b; .. > ->
   (Gl.rgb * Gl.point3) ObjMaker.VertexMap.t ->

@@ -9,7 +9,7 @@ let initGL () =
   GlClear.depth 1.0;
   Gl.enable `depth_test;
   GlFunc.depth_func `lequal;
-
+  Gl.enable `polygon_offset_line;
   GlMisc.hint `perspective_correction `nicest
 let resizeGLScene ~width ~height =
     initGL ();
@@ -77,8 +77,9 @@ let autoplay ()= if !ap then rotateY 1
 let toggle_autoplay () = ap := not (!ap); ()
 let resetCamera ()=
     rx:=0.; ry:=90.; rz:=180.; tx:=(-30.); ty:=0.; tz := (-70.);()
-(* let toggleWireframe () = 
-    Gl.polygonMode `front_and_back `line *)
+
+let toggleWireframe () = (* Gl.polygonMode [`front_and_back; `line] *)
+    Gl.enable `polygon_offset_line
 
 let drawScene area vmap flist ()=
   area#make_current ();

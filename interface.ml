@@ -48,7 +48,7 @@ let bbox = GPack.button_box `VERTICAL
     ~label:"Original Image"
     ~packing:vbox#add ()*)
 let frame_image_treated = GBin.frame
-    ~label: "Image traitée"
+    ~label: "Image sélectionnée"
     ~width:((!width)/10)
     ~packing:vbox#add ()
 let frame_visualisation = GBin.frame
@@ -113,6 +113,7 @@ let area =
       else if key =  GdkKeysyms._a   then Fridi.translateY (1)
       else if key =  GdkKeysyms._e   then Fridi.translateY (-1)
       else if key =  GdkKeysyms._o   then Fridi.resetCamera ()
+      else if key =  GdkKeysyms._f   then Fridi.toggleWireframe ()
       else if key =  GdkKeysyms._space then Fridi.toggle_autoplay ();
       true end
     end);
@@ -177,15 +178,15 @@ let about_button =
     ~copyright:"Copyright © 2011-2012 Cartastrophe Project"
     ~license:"EPITA 2015 "
     ~version:"42.42"
-    ~website:"http://cartastro0.wordpress.com/"
-    ~website_label:"Le site Cartastrophe"
+    ~website:"http://cartastro0.wordpress.com/aide/"
+    ~website_label:"Aide"
     ~position:`CENTER_ON_PARENT
     ~parent:window
     ~destroy_with_parent:true () in
   let btn = GButton.button 
-    ~stock:`ABOUT 
+    ~stock:`HELP 
     ~packing:bbox#add () in
-  sw (GMisc.image ~stock:`ABOUT ~packing:btn#set_image ());
+  sw (GMisc.image ~stock:`HELP ~packing:btn#set_image ());
   sw (btn#connect#clicked (fun () -> ignore (dlg#run ()); dlg#misc#hide ()));
   btn
 (*Bouton quitter*)

@@ -45,7 +45,7 @@ let rgb2lab (r,g,b) =
 		Hashtbl.add rgblabHt (r,g,b) lab;
 		lab
 let f_i = float_of_int
-		(* Chiffre entre O et 1 reprÅÈsentant la diffÅÈrence entre les couleurs    *)
+		(* Chiffre entre O et 1 reprÈsentant la diffÈrence entre les couleurs    *)
 let rgb_distance (r1, g1, b1) (r2, g2, b2) =
 	 ((f_i r1 -. f_i r2)**2. 
 			+. (f_i g1 -. f_i g2)**2. 
@@ -71,7 +71,7 @@ let crisscross img (w,h) interval =
 			done
 	done;
 	img
-(* detecte les couleurs appartenantes Å‡ la mÍme zone , utilisant une      *)
+(* detecte les couleurs appartenantes ‡ la mÍme zone , utilisant une      *)
 (* fonction de distinction de couleurs                                     *)
 let is_same_color c1 c2 =
 	try
@@ -90,7 +90,7 @@ let colorIndex c1 list =
 		nested 0 list
 let getColorAt (x,y) = 
     if x>(!w) || y>(!h) then
-      Sdlvideo.get_pixel_color !image !w !h
+      Sdlvideo.get_pixel_color !image (!w) (!h)
     else (Sdlvideo.get_pixel_color !image x y)
 let getHeightFor color =
     (* let rec count i c = (function
@@ -113,6 +113,7 @@ let rec print_borders img = function
 
 let detect_areas img= (* detecte les diffÅÈrentes zones *)
     image := img;
+    colors := [];
     let (width,height)=get_dims img in
 
 	let breaks = ref [] in
